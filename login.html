@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Enhanced Case Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+    <!-- URL Protection -->
+    <script>
+        // Prevent URL manipulation to access protected resources
+        window.addEventListener('load', function() {
+            const protectedPaths = ['/uploads/', '/documents/', '/files/', '/assets/'];
+            const currentPath = window.location.pathname;
+            
+            protectedPaths.forEach(path => {
+                if (currentPath.includes(path) && !localStorage.getItem('currentUser')) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+
+    <div class="container-fluid vh-100">
+        <div class="row h-100">
+            <!-- Left Side - Branding -->
+            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
+                <div class="text-center text-white">
+                    <div class="mb-4">
+                        <i class="fas fa-balance-scale fa-5x mb-3"></i>
+                        <h1 class="display-4 fw-bold">Case Management</h1>
+                        <p class="lead">Professional Legal Case Management System</p>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="p-3">
+                                <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                                <p class="small">Secure & Protected</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3">
+                                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                <p class="small">Cloud Sync</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3">
+                                <i class="fas fa-mobile-alt fa-2x mb-2"></i>
+                                <p class="small">Mobile Ready</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Login Form -->
+            <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                <div class="w-100" style="max-width: 400px;">
+                    <div class="login-container">
+                        <div class="login-header text-white">
+                            <h1><i class="fas fa-user-circle me-2"></i>Login</h1>
+                            <p class="mb-0">Access your case management system</p>
+                        </div>
+                        <div class="login-body">
+                            <!-- Login Error Alert -->
+                            <div id="loginError" class="alert alert-danger d-none" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="loginErrorText">Invalid credentials</span>
+                            </div>
+                            
+                            <!-- Login Form -->
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Username
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="username" required 
+                                           placeholder="Enter your username" autocomplete="username">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock me-2"></i>Password
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="password" class="form-control form-control-lg" id="password" required 
+                                               placeholder="Enter your password" autocomplete="current-password">
+                                        <button type="button" class="btn btn-outline-secondary position-absolute end-0 top-0 h-100" 
+                                                id="togglePassword" style="z-index: 10;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="loginBtn">
+                                    <span id="loginBtnText">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                    </span>
+                                    <span id="loginBtnLoading" class="d-none">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        Signing In...
+                                    </span>
+                                </button>
+                            </form>
+                            
+                            <!-- Demo Credentials -->
+                            <div class="demo-credentials">
+                                <small class="text-muted d-block text-center mb-3">
+                                    <i class="fas fa-info-circle me-1"></i>Demo Credentials
+                                </small>
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <button class="btn btn-outline-primary btn-sm w-100 demo-login-btn" 
+                                                data-username="admin" data-password="Admin123!">
+                                            <small>Admin</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-outline-warning btn-sm w-100 demo-login-btn" 
+                                                data-username="manager" data-password="Manager123!">
+                                            <small>Manager</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-outline-info btn-sm w-100 demo-login-btn" 
+                                                data-username="viewer" data-password="Viewer123!">
+                                            <small>Viewer</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Info -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            Enhanced Case Management System v2.0<br>
+                            <i class="fas fa-shield-alt me-1"></i>Secure Login Portal
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Login Script -->
+    <script>
+        // Default users for authentication
+        const defaultUsers = [
+            { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' },
+            { id: 2, username: 'manager', password: 'Manager123!', role: 'restricted_admin', email: 'manager@example.com', phone: '+1234567891' },
+            { id: 3, username: 'viewer', password: 'Viewer123!', role: 'viewer', email: 'viewer@example.com', phone: '+1234567892' }
+        ];
+
+        // Check if already logged in
+        if (localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            const errorText = document.getElementById('loginErrorText');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnLoading = document.getElementById('loginBtnLoading');
+            
+            // Show loading state
+            loginBtnText.classList.add('d-none');
+            loginBtnLoading.classList.remove('d-none');
+            loginBtn.disabled = true;
+            errorDiv.classList.add('d-none');
+            
+            try {
+                // Simulate authentication delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Find user
+                const user = defaultUsers.find(u => u.username === username && u.password === password);
+                
+                if (user) {
+                    // Store user data
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Show success message briefly
+                    loginBtnLoading.innerHTML = '<i class="fas fa-check me-2"></i>Success! Redirecting...';
+                    
+                    // Redirect to main application
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    throw new Error('Invalid username or password');
+                }
+            } catch (error) {
+                // Show error
+                errorText.textContent = error.message;
+                errorDiv.classList.remove('d-none');
+                
+                // Reset button state
+                loginBtnText.classList.remove('d-none');
+                loginBtnLoading.classList.add('d-none');
+                loginBtn.disabled = false;
+                
+                // Shake animation for error
+                document.querySelector('.login-container').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.login-container').style.animation = '';
+                }, 500);
+            }
+        });
+
+        // Demo login buttons
+        document.querySelectorAll('.demo-login-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('username').value = this.dataset.username;
+                document.getElementById('password').value = this.dataset.password;
+            });
+        });
+
+        // Password visibility toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Auto-focus username field
+        document.getElementById('username').focus();
+
+        // Enter key support for password field
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+
+    <style>
+        .demo-credentials {
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .demo-login-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        @keyframes shake {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-10px); }
+            30% { transform: translateX(10px); }
+            60% { transform: translateX(-5px); }
+            90% { transform: translateX(5px); }
+        }
+
+        .position-relative .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        #togglePassword {
+            border-left: none;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</body>
+</html>

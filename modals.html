@@ -1,0 +1,641 @@
+<!-- Add Case Modal - Comprehensive -->
+<div class="modal fade" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCaseModalTitle">Add New Case</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCaseForm">
+                    <input type="hidden" id="caseId">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="section-title">Basic Information</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Main Number *</label>
+                                <input type="text" class="form-control" id="caseNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">SR Number</label>
+                                <input type="text" class="form-control" id="srNumber">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">CNR No.</label>
+                                <input type="text" class="form-control" id="cnr">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Case Status</label>
+                                <select class="form-control" id="status">
+                                    <option value="pending">Pending</option>
+                                    <option value="open">Open</option>
+                                    <option value="closed">Closed</option>
+                                    <option value="disposed">Disposed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="section-title">Party Information</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Primary Petitioner</label>
+                                <input type="text" class="form-control" id="primaryPetitioner">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Primary Respondent</label>
+                                <input type="text" class="form-control" id="primaryRespondent">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Petitioner Advocate</label>
+                                <input type="text" class="form-control" id="petitionerAdv">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Respondent Advocate</label>
+                                <input type="text" class="form-control" id="respondentAdv">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="section-title">Case Details</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Case Category</label>
+                                <input type="text" class="form-control" id="category">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sub Category</label>
+                                <input type="text" class="form-control" id="subCategory">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sub Sub Category</label>
+                                <input type="text" class="form-control" id="subSubCategory">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">District</label>
+                                <input type="text" class="form-control" id="district">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Purpose</label>
+                                <input type="text" class="form-control" id="purpose">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Hon'ble Judges</label>
+                                <input type="text" class="form-control" id="judName">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="section-title">Important Dates</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Filing Date</label>
+                                <input type="date" class="form-control" id="filingDate">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Registration Date</label>
+                                <input type="date" class="form-control" id="registrationDate">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Listing Date</label>
+                                <input type="date" class="form-control" id="listingDate">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Disposal Date</label>
+                                <input type="date" class="form-control" id="dispDate">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Disposal Type</label>
+                                <input type="text" class="form-control" id="dispType">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prayer</label>
+                        <textarea class="form-control" id="prayer" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Dynamic Sections -->
+                    <h6 class="section-title">Petitioners</h6>
+                    <div id="petitionersContainer"></div>
+                    <button type="button" id="addPetitioner" class="btn btn-sm btn-outline-primary mb-3">Add Petitioner</button>
+                    
+                    <h6 class="section-title">Respondents</h6>
+                    <div id="respondentsContainer"></div>
+                    <button type="button" id="addRespondent" class="btn btn-sm btn-outline-primary mb-3">Add Respondent</button>
+                    
+                    <h6 class="section-title">IA Details</h6>
+                    <div id="iaDetailsContainer"></div>
+                    <button type="button" id="addIaDetail" class="btn btn-sm btn-outline-primary mb-3">Add IA Detail</button>
+                    
+                    <h6 class="section-title">IA SR Details</h6>
+                    <div id="iaSrDetailsContainer"></div>
+                    <button type="button" id="addIaSrDetail" class="btn btn-sm btn-outline-primary mb-3">Add IA SR Detail</button>
+                    
+                    <h6 class="section-title">USR Details</h6>
+                    <div id="usrDetailsContainer"></div>
+                    <button type="button" id="addUsrDetail" class="btn btn-sm btn-outline-primary mb-3">Add USR Detail</button>
+                    
+                    <h6 class="section-title">Connected Matters</h6>
+                    <div id="connectedMattersContainer"></div>
+                    <button type="button" id="addConnectedMatter" class="btn btn-sm btn-outline-primary mb-3">Add Connected Matter</button>
+                    
+                    <h6 class="section-title">Vakalath</h6>
+                    <div id="vakalathContainer"></div>
+                    <button type="button" id="addVakalath" class="btn btn-sm btn-outline-primary mb-3">Add Vakalath</button>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="section-title">Lower Court Details</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Court Name</label>
+                                <input type="text" class="form-control" id="lcCourt">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">District</label>
+                                <input type="text" class="form-control" id="lcDist">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lower Court Case No.</label>
+                                <input type="text" class="form-control" id="lcCaseNo">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Hon'ble Judge</label>
+                                <input type="text" class="form-control" id="lcJudge">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Date of Judgement</label>
+                                <input type="date" class="form-control" id="lcJudgeDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="section-title">Documents</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Disposal Order File</label>
+                                <input type="file" class="form-control" id="disposalOrderFile" accept=".pdf">
+                                <div id="existingDisposalFile"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Other Documents</label>
+                                <input type="file" class="form-control" id="otherDocuments" accept=".pdf" multiple>
+                                <div id="existingOtherDocs"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="section-title">Orders</h6>
+                    <div id="ordersContainer"></div>
+                    <button type="button" id="addOrder" class="btn btn-sm btn-outline-primary mb-3">Add Order</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCaseBtn">Save Case</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Case Details Modal -->
+<div class="modal fade" id="caseDetailsModal" tabindex="-1" aria-labelledby="caseDetailsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="caseDetailsModalTitle">Case Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="caseDetailsContent">
+                <!-- Content populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editCaseFromModalBtn">Edit Case</button>
+                <button type="button" class="btn btn-success" id="downloadCasePdfBtn">Download PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalTitle">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskForm">
+                    <input type="hidden" id="taskId">
+                    <div class="mb-3">
+                        <label class="form-label">Task Title *</label>
+                        <input type="text" class="form-control" id="taskTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Case Number</label>
+                        <select class="form-control" id="taskCaseNumber">
+                            <option value="">Select Case</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assignees</label>
+                        <select class="form-control" id="taskAssignees" multiple>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="taskDueDate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" id="taskStatus">
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveTaskBtn">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalTitle">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <input type="hidden" id="userId">
+                    <div class="mb-3">
+                        <label class="form-label">Username *</label>
+                        <input type="text" class="form-control" id="userUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password *</label>
+                        <input type="password" class="form-control" id="userPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-control" id="userRole">
+                            <option value="viewer">Viewer</option>
+                            <option value="restricted_admin">Restricted Admin</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="userEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="userPhone">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Invoice Modal -->
+<div class="modal fade" id="addInvoiceModal" tabindex="-1" aria-labelledby="addInvoiceModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addInvoiceModalTitle">Add Invoice Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addInvoiceForm">
+                    <input type="hidden" id="invoiceId">
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Type *</label>
+                        <select class="form-control" id="invoiceType" required>
+                            <option value="">Select Type</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description *</label>
+                        <input type="text" class="form-control" id="invoiceDescription" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount (₹) *</label>
+                        <input type="number" class="form-control" id="invoiceAmount" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" id="invoiceDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Related Case</label>
+                        <select class="form-control" id="invoiceCaseNumber">
+                            <option value="">Select Case (Optional)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Supporting Documents</label>
+                        <input type="file" class="form-control" id="invoiceDocuments" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="invoiceNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveInvoiceBtn">Submit Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload File Modal -->
+<div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadFileModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadFileModalTitle">Upload File to Office Copy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadFileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select File *</label>
+                        <input type="file" class="form-control" id="officeFile" required>
+                        <div class="form-text">Maximum file size: 10MB</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="fileDescription" rows="3" placeholder="Brief description of the file..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="uploadFileSubmitBtn">Upload File</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reminder Settings Modal -->
+<div class="modal fade" id="reminderSettingsModal" tabindex="-1" aria-labelledby="reminderSettingsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reminderSettingsModalTitle">Reminder Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reminderSettingsForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="section-title">Email Settings</h6>
+                            <div class="mb-3">
+                                <label class="form-label">SMTP Server</label>
+                                <input type="text" class="form-control" id="smtpServer" placeholder="smtp.gmail.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">SMTP Port</label>
+                                <input type="number" class="form-control" id="smtpPort" value="587">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email Username</label>
+                                <input type="email" class="form-control" id="emailUsername">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email Password</label>
+                                <input type="password" class="form-control" id="emailPassword">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="section-title">SMS Settings</h6>
+                            <div class="mb-3">
+                                <label class="form-label">SMS API Key</label>
+                                <input type="text" class="form-control" id="smsApiKey">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">SMS Provider</label>
+                                <select class="form-control" id="smsProvider">
+                                    <option value="twilio">Twilio</option>
+                                    <option value="textlocal">TextLocal</option>
+                                    <option value="msg91">MSG91</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sender ID</label>
+                                <input type="text" class="form-control" id="smsSenderId">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="section-title">Reminder Rules</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableFilingReminders" checked>
+                                    <label class="form-check-label" for="enableFilingReminders">
+                                        Filing Date Reminders
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Send reminders 1 day before filing date</small>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableHearingReminders" checked>
+                                    <label class="form-check-label" for="enableHearingReminders">
+                                        Hearing Date Reminders
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Send reminders 1 day before hearing date</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableOverdueReminders" checked>
+                                    <label class="form-check-label" for="enableOverdueReminders">
+                                        Overdue Task Reminders
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Send daily reminders for overdue tasks</small>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableWeeklyReports" checked>
+                                    <label class="form-check-label" for="enableWeeklyReports">
+                                        Weekly Summary Reports
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Send weekly case summary reports</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReminderSettingsBtn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal fade" id="composeMessageModal" tabindex="-1" aria-labelledby="composeMessageModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="composeMessageModalTitle">Compose Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="composeMessageForm">
+                    <div class="mb-3">
+                        <label class="form-label">Recipients *</label>
+                        <select class="form-control" id="messageRecipients" multiple required>
+                            <!-- Populated by JavaScript -->
+                        </select>
+                        <div class="form-text">Hold Ctrl (Cmd on Mac) to select multiple recipients</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message Type *</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="messageType" id="emailType" value="email" checked>
+                            <label class="form-check-label" for="emailType">
+                                <i class="fas fa-envelope me-1"></i>Email
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="messageType" id="smsType" value="sms">
+                            <label class="form-check-label" for="smsType">
+                                <i class="fas fa-sms me-1"></i>SMS
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="messageType" id="bothType" value="both">
+                            <label class="form-check-label" for="bothType">
+                                <i class="fas fa-paper-plane me-1"></i>Both
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="emailSubjectDiv">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="messageSubject">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message *</label>
+                        <textarea class="form-control" id="messageContent" rows="6" required placeholder="Type your message here..."></textarea>
+                        <div class="form-text">Available variables: {{name}}, {{case_number}}, {{due_date}}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select class="form-control" id="messagePriority">
+                            <option value="low">Low</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="sendMessageBtn">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalTitle">User Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="text-center mb-4">
+                        <div class="user-avatar mx-auto" style="width: 80px; height: 80px; font-size: 2rem;" id="profileAvatar">U</div>
+                        <h5 id="profileUsername" class="mt-2">Username</h5>
+                        <span class="badge bg-primary" id="profileRole">Role</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="profileEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="profilePhone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="profilePassword" placeholder="Leave blank to keep current password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveProfileBtn">Update Profile</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.section-title {
+    color: var(--primary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    margin-top: 20px;
+}
+
+.section-title:first-child {
+    margin-top: 0;
+}
+
+.dynamic-section {
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.dynamic-section {
+    position: relative;
+}
+
+#messageType input[type="radio"]:checked + label {
+    color: var(--accent);
+    font-weight: 600;
+}
+</style>
