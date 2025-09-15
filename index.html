@@ -31,8 +31,21 @@
         </div>
     </div>
 
+    <!-- Mobile Header (visible only on mobile) -->
+    <div class="mobile-header d-lg-none">
+        <div class="d-flex justify-content-between align-items-center px-3 py-2">
+            <h4 class="mb-0 text-white"><i class="fas fa-balance-scale me-2"></i>CMS</h4>
+            <button id="mobileToggleBtn" class="btn btn-light btn-sm">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebarBackdrop" class="backdrop d-none"></div>
+
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h4><i class="fas fa-balance-scale me-2"></i>Case Management System</h4>
         </div>
@@ -956,5 +969,39 @@
 
     <!-- Main Script -->
     <script src="script.js"></script>
+
+    <!-- Inline JS for Mobile Toggle (add this to script.js or here for now) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggleBtn = document.getElementById('mobileToggleBtn');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            if (mobileToggleBtn) {
+                mobileToggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                    backdrop.classList.toggle('d-none');
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                    backdrop.classList.add('d-none');
+                });
+            }
+
+            // Close sidebar on nav link click for mobile
+            const navLinks = document.querySelectorAll('.nav-link[data-page]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('show');
+                        backdrop.classList.add('d-none');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
