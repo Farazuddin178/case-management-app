@@ -1,228 +1,262 @@
-# Enhanced Case Management System - Complete Feature Update
+# Enhanced Case Management System v2.0
 
-## 🚀 Major Improvements & New Features
+A comprehensive legal case management system with GitHub integration for secure data persistence and real-time synchronization across devices.
 
-### ✅ **Fixed Issues**
-1. **Office Copy File Upload** - Removed permission error for viewers, they can now upload without restrictions
-2. **Edit Case Functionality** - Fixed the edit case button with proper error handling and form population
-3. **Automatic Email Reminders** - Implemented working email/SMS reminder system with proper scheduling
-4. **Case Trend Analytics** - Enhanced graph with better data visualization and 12-month trend analysis
-5. **File Size Limits** - Removed all file upload size restrictions
+## 🚀 Features
 
-### 🆕 **New Features Added**
+### Core Functionality
+- **Case Management**: Complete case lifecycle management with detailed case information
+- **Task Management**: Assign and track tasks with due dates and status updates
+- **User Management**: Role-based access control (Admin, Restricted Admin, Viewer)
+- **Invoice Management**: Request, approve, and track financial transactions
+- **Office Copy Management**: Upload and manage legal documents
+- **Reports & Analytics**: Comprehensive reporting with charts and visualizations
+- **Messaging System**: Internal communication between users
+- **Reminder System**: Automated notifications for important deadlines
 
-#### **Task Management with Comments System**
-- ✅ Add comments to any task (chat-like functionality)
-- ✅ View all comments with timestamps and author names
-- ✅ Comment counter badges on task list
-- ✅ Enhanced task details modal with full comment history
-- ✅ Edit and delete tasks with proper permissions
+### Enhanced Features in v2.0
+- **GitHub Integration**: Automatic data synchronization with GitHub repositories
+- **File Upload to GitHub**: Documents are uploaded as assets to your GitHub repo
+- **Real-time Sync**: Data synchronization across multiple devices and sessions
+- **Secure Authentication**: Enhanced login system without exposed demo credentials
+- **Responsive Design**: Mobile-friendly interface with touch-optimized controls
 
-#### **Enhanced Case Management**
-- ✅ File upload options for orders (PDF files can be attached to each order)
-- ✅ Disposal order file upload for closed/disposed cases
-- ✅ All case fields are fully editable with the comprehensive modal structure you provided
-- ✅ Enhanced case data structure supports all nested arrays (petitioners, respondents, IA details, etc.)
+## 🔐 Security Features
 
-#### **Responsive Design**
-- ✅ Fully responsive design for all screen sizes (desktop, tablet, mobile)
-- ✅ Mobile-first navigation with collapsible sidebar
-- ✅ Touch-friendly interface elements
-- ✅ Optimized layouts for different viewport sizes
-- ✅ Mobile menu toggle with overlay
+### Secure Default Admin Login
+- **Default admin credentials**: `admin` / `Admin123!`
+- **No visible credentials**: Demo credentials removed from UI for security
+- **First-time setup**: System initializes with secure admin account
+- **Password protection**: All user data is password-protected
 
-#### **Access Control Refinements**
-- ✅ Viewers: Can only view data and upload to office copy (no edit/delete permissions)
-- ✅ Restricted Admins: Can set up reminders, send messages, request invoices
-- ✅ Admins: Full access including API key management, user management, invoice approval
+### GitHub Data Persistence
+- **Encrypted storage**: Tokens stored securely in localStorage
+- **Private repositories**: Supports private GitHub repositories
+- **Access control**: Repository-level access control for data security
 
-#### **Automatic Reminder System**
-- ✅ Email and SMS reminders for upcoming filing dates (tomorrow)
-- ✅ Overdue case notifications for missed deadlines
-- ✅ Automatic scheduling checks every hour
-- ✅ Configurable reminder settings for admins
-- ✅ Message history tracking
+## 📋 Prerequisites
 
-#### **Enhanced Office Copy Management**
-- ✅ Any user can upload files without size restrictions
-- ✅ Only admins can view, download, and delete files
-- ✅ File metadata tracking (size, upload date, uploader)
-- ✅ Secure file handling with proper permissions
+1. **GitHub Account**: Required for data persistence
+2. **GitHub Repository**: Create a private repository for data storage
+3. **Personal Access Token**: GitHub token with repository permissions
+4. **Modern Web Browser**: Chrome, Firefox, Safari, or Edge
 
-### 🔒 **Security & Permissions**
+## 🛠 Setup Instructions
 
-#### **Role-Based Access Control**
-| Feature | Viewer | Restricted Admin | Admin |
-|---------|--------|------------------|-------|
-| View Cases | ✅ | ✅ | ✅ |
-| Edit/Add Cases | ❌ | ✅ | ✅ |
-| Delete Cases | ❌ | ❌ | ✅ |
-| Upload Office Files | ✅ | ✅ | ✅ |
-| Download Office Files | ❌ | ❌ | ✅ |
-| Send Messages | ❌ | ✅ | ✅ |
-| Setup Reminders | ❌ | ✅ | ✅ |
-| API Key Management | ❌ | ❌ | ✅ |
-| User Management | ❌ | ❌ | ✅ |
-| Invoice Approval | ❌ | ❌ | ✅ |
-| Invoice Requests | ❌ | ✅ | ✅ |
-| GitHub Sync | ❌ | ✅ | ✅ |
+### 1. Create GitHub Repository
 
-### 📱 **Responsive Design Features**
+1. Go to [GitHub](https://github.com) and create a new repository
+2. **Repository Name**: `case-management-data` (or your preferred name)
+3. **Visibility**: Private (recommended for security)
+4. **Initialize**: ✅ Add README file
 
-#### **Mobile Optimizations**
-- Collapsible sidebar with mobile menu toggle
-- Touch-friendly buttons and form elements  
-- Optimized table layouts for small screens
-- Responsive modal dialogs
-- Mobile-first typography and spacing
-- Proper viewport handling
+### 2. Generate Personal Access Token
 
-#### **Tablet Optimizations**
-- Adaptive grid layouts
-- Optimized card arrangements
-- Touch-friendly interface elements
-- Balanced content distribution
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Click "Generate new token (classic)"
+3. **Scopes required**:
+   - `repo` (Full control of private repositories)
+   - `contents:write` (Write access to repository contents)
+4. Copy and save your token securely
 
-#### **Desktop Enhancements**
-- Full sidebar navigation
-- Multi-column layouts
-- Enhanced hover effects
-- Keyboard shortcuts support
+### 3. Configure the System
 
-### 🎨 **UI/UX Improvements**
+1. Open the application in your web browser
+2. Login with default admin credentials:
+   - **Username**: `admin`
+   - **Password**: `Admin123!`
+3. Navigate to **Exports** page
+4. Fill in GitHub settings:
+   - **GitHub Owner**: Your GitHub username
+   - **Repository Name**: `case-management-data`
+   - **Branch**: `main`
+   - **Personal Access Token**: Your generated token
+5. Click **Save Settings** and **Test Connection**
 
-#### **Enhanced Visual Design**
-- Modern gradient color schemes
-- Improved card shadows and animations
-- Better typography hierarchy
-- Consistent spacing and padding
-- Professional status badges
-- Loading states and transitions
+## 🚀 Quick Start
 
-#### **Data Visualization**
-- Improved case trend charts with 12-month view
-- Enhanced analytics with better colors and labels
-- Interactive chart elements
-- Responsive chart layouts
+### First Login
+1. Open `index.html` in your web browser
+2. Login with: `admin` / `Admin123!`
+3. Configure GitHub integration in Exports section
+4. Start adding cases and users
 
-### 🔧 **Technical Improvements**
+### Adding Cases
+1. Go to **Cases** page
+2. Click **Add New Case**
+3. Fill in case details (all sections preserved):
+   - Basic Information
+   - Party Information
+   - Case Details
+   - Important Dates
+   - Prayer
+   - Petitioners/Respondents
+   - IA Details
+   - Lower Court Details
+   - Documents (will upload to GitHub)
+   - Orders
+4. Click **Save Case** (automatically syncs to GitHub)
 
-#### **Code Structure**
-- Modular function organization
-- Enhanced error handling
-- Improved data validation
-- Better state management
-- Optimized performance
+### Managing Users
+1. Go to **User Management** (Admin only)
+2. Click **Add New User**
+3. Set username, password, email, phone, and role
+4. User data automatically syncs to GitHub
 
-#### **File Management**
-- Removed arbitrary file size limits
-- Enhanced file type validation
-- Proper file metadata handling
-- Secure upload/download logic
+### File Management
+1. Go to **Office Copy** page
+2. Click **Upload File**
+3. Files are automatically uploaded to GitHub repository
+4. Accessible via generated GitHub URLs
 
-### 📋 **Complete Case Data Structure**
-The system now supports the full case data structure you provided:
+## 📁 Data Structure
 
-```javascript
-const cases = [
-    { 
-        id: 1, 
-        caseNumber: 'CRLP 13925/2024', 
-        srNumber: 'CRLPSR 16259/2024', 
-        status: 'closed',
-        filingDate: '2024-11-13', 
-        registrationDate: '2024-11-16', 
-        primaryPetitioner: 'Preethi Sivaraman', 
-        primaryRespondent: 'The State of Telangana', 
-        purpose: 'ADMISSION', 
-        cnr: 'HBHC010619412024', 
-        petitionerAdv: 'MD FASIUDDIN', 
-        respondentAdv: 'PUBLIC PROSECUTOR', 
-        category: 'CRLP', 
-        subCategory: 'CRIMINAL PETITION', 
-        subSubCategory: 'U/s.482 Cr.p.c Quash the F.I.R', 
-        district: 'HYDERABAD', 
-        listingDate: '2025-04-04', 
-        pdrStatus: 'DISPOSED', 
-        dispDate: '2025-04-04', 
-        dispType: 'DISMISSED AS INFRUCTUOUS', 
-        judName: 'The Honourable Sri Justice K.SURENDER', 
-        disposalOrderUrl: 'file_upload_option',
-        prayer: '...',
-        petitioners: [{sno:1, name: '...', address: '...'}],
-        respondents: [{rno:1, name: '...', address: '...'}, {rno:2, name: '...', address: '...'}],
-        iaDetails: [...],
-        iaSrDetails: [...],
-        usrDetails: [...],
-        connectedMatters: [],
-        vakalath: [],
-        lowerCourtDetails: {},
-        orders: [
-            {orderOn: '...', judgeName: '...', dateOfOrders: '...', orderType: '...', orderDetails: '...', orderFile: 'upload_option'},
-        ],
-        otherDocuments: []
-    }
-];
+### GitHub Repository Structure
+```
+case-management-data/
+├── data.json                 # Main data file
+├── documents/
+│   ├── case-files/          # Case-related documents
+│   ├── disposal-orders/     # Disposal order files
+│   └── invoices/            # Invoice supporting documents
+├── office-copy/             # Office copy uploads
+└── uploads/                 # General file uploads
 ```
 
-### 🛠️ **Installation & Setup**
-
-#### **For GitHub Pages Deployment**
-1. Fork or clone this repository
-2. Copy `.env.example` to `.env` and configure your settings
-3. Enable GitHub Pages in repository settings
-4. Update the configuration in the `.env` file with your actual values
-5. Push to your repository - the site will be live at `https://yourusername.github.io/repository-name`
-
-#### **Local Development**
-1. Download all files to a local directory
-2. Open `login.html` in a web browser
-3. Use the demo credentials provided below
-4. No additional setup required - runs entirely in the browser
-
-### 🔐 **Demo Credentials**
-
-#### **Test the System**
-- **Admin:** `admin` / `Admin123!`
-  - Full system access, can manage users, approve invoices, configure API keys
-- **Restricted Admin:** `manager` / `Manager123!`  
-  - Can add/edit cases, send reminders, request invoices, sync to GitHub
-- **Viewer:** `viewer` / `Viewer123!`
-  - Read-only access, can only upload to office copy
-
-### 📁 **Project Structure**
-```
-enhanced-case-management/
-├── login.html              # Login page
-├── index.html              # Main application
-├── script.js               # Core application logic  
-├── styles.css              # Responsive stylesheets
-├── modals.html             # Modal dialogs
-├── .env.example            # Environment configuration template
-├── assets/
-│   ├── github-sync.js      # GitHub integration
-│   ├── idb-utils.js        # IndexedDB utilities
-│   └── export-utils.js     # Export functionality
-└── README.md               # This documentation
+### Data.json Schema
+```json
+{
+  "users": [...],
+  "cases": [...],
+  "tasks": [...],
+  "invoices": [...],
+  "officeFiles": [...],
+  "notifications": [...],
+  "reminders": [...],
+  "messages": [...],
+  "lastUpdated": "2025-09-17T20:41:21Z",
+  "version": "2.0"
+}
 ```
 
-### 🚀 **Ready to Use**
+## 🔄 Data Synchronization
 
-**Start here:** <filepath>enhanced-case-management/login.html</filepath>
+### Automatic Sync
+- **On Save**: Every save operation (cases, tasks, users, etc.) triggers GitHub sync
+- **On Load**: Application loads latest data from GitHub on startup
+- **Fallback**: If GitHub sync fails, data is saved to localStorage
+- **Status Indicator**: Sync status visible in navigation and exports page
 
-The system is now fully functional with all requested features:
-- ✅ Complete responsive design
-- ✅ Task commenting system  
-- ✅ Enhanced case management with file uploads
-- ✅ Fixed edit functionality
-- ✅ Working reminder system
-- ✅ Proper access control
-- ✅ Mobile-friendly interface
-- ✅ No file size restrictions
-- ✅ GitHub deployment ready
+### Manual Sync
+- Use **Sync Now** button in Exports page
+- **Test Connection** to verify GitHub settings
+- **Last Sync** timestamp shows recent synchronization
 
-### 📞 **Support & Customization**
+## 👥 User Roles
 
-The system is built with modern web technologies and follows best practices for maintainability and scalability. All features are fully documented in the code with clear function names and comments.
+### Admin
+- Full access to all features
+- User management capabilities
+- Invoice approval authority
+- File download/delete permissions
+- GitHub sync configuration
 
-For additional customizations or feature requests, the modular code structure makes it easy to extend functionality while maintaining system stability.
+### Restricted Admin
+- Case and task management
+- Invoice request (approval required)
+- File upload capabilities
+- Reports and analytics access
+- No user management access
+
+### Viewer
+- Read-only access to cases and tasks
+- Cannot modify data
+- Can view reports
+- Cannot access user management or exports
+
+## 📱 Mobile Compatibility
+
+- **Responsive Design**: Optimized for mobile devices
+- **Touch Controls**: Mobile-friendly buttons and navigation
+- **Sidebar Navigation**: Collapsible sidebar for mobile screens
+- **Form Optimization**: Mobile-optimized form inputs
+
+## 🔧 Customization
+
+### Styling
+- Modify `styles.css` for custom themes
+- Case detail styling preserved exactly as requested
+- Bootstrap 5 framework for consistent design
+
+### Functionality
+- Extend `script.js` for additional features
+- GitHub sync utility in `github-sync.js`
+- Modular design for easy customization
+
+## 🚨 Troubleshooting
+
+### GitHub Sync Issues
+1. **Connection Failed**: Check token permissions and repository access
+2. **Upload Failed**: Verify repository exists and token has write access
+3. **Sync Status**: Check sync indicator in navigation
+
+### Authentication Issues
+1. **Login Failed**: Verify username/password combination
+2. **Access Denied**: Check user role permissions
+3. **Session Expired**: Re-login to refresh session
+
+### File Upload Issues
+1. **Upload Failed**: Check GitHub configuration and token
+2. **File Too Large**: GitHub has file size limits (100MB)
+3. **Unsupported Format**: Verify file format compatibility
+
+## 📈 Data Migration
+
+### From Previous Version
+1. Export existing data using old system
+2. Configure GitHub integration
+3. Import data manually or use migration scripts
+
+### Backup Strategy
+1. **GitHub Repository**: Primary backup
+2. **Local Export**: Use PDF/CSV export features
+3. **Repository Clone**: Clone GitHub repository for offline backup
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Implement changes
+4. Test thoroughly
+5. Submit pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+1. Check troubleshooting section
+2. Review GitHub repository issues
+3. Contact system administrator
+
+## 🔄 Version History
+
+### v2.0 (Current)
+- GitHub integration for data persistence
+- File upload to GitHub repositories
+- Enhanced security (removed demo credentials)
+- Real-time data synchronization
+- Mobile responsive improvements
+
+### v1.0
+- Basic case management functionality
+- Local data storage
+- User authentication
+- Task and invoice management
+
+---
+
+**MiniMax Agent** - Case Management System v2.0
+Built with modern web technologies for secure, efficient legal case management.

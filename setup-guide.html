@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Guide - Enhanced Case Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h1 class="display-4"><i class="fas fa-balance-scale text-primary me-3"></i>Enhanced Case Management System</h1>
+                    <p class="lead">Professional Legal Case Management with GitHub Integration</p>
+                    <div class="badge bg-success fs-6">Version 2.0 - GitHub Sync Enabled</div>
+                </div>
+
+                <!-- Quick Start -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Start</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-sign-in-alt text-success me-2"></i>1. Login</h5>
+                                <p>Access the system with secure default admin credentials:</p>
+                                <div class="alert alert-info">
+                                    <strong>Username:</strong> admin<br>
+                                    <strong>Password:</strong> Admin123!
+                                </div>
+                                <a href="index.html" class="btn btn-primary">
+                                    <i class="fas fa-external-link-alt me-1"></i>Access System
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fab fa-github text-dark me-2"></i>2. Setup GitHub</h5>
+                                <p>Configure GitHub integration for data persistence:</p>
+                                <ol class="small">
+                                    <li>Create GitHub repository: <code>case-management-data</code></li>
+                                    <li>Generate Personal Access Token</li>
+                                    <li>Configure in Exports page</li>
+                                    <li>Test connection and sync</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GitHub Setup -->
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h3 class="mb-0"><i class="fab fa-github me-2"></i>GitHub Integration Setup</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-primary h-100">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">Step 1: Repository</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Create a new GitHub repository:</strong></p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success me-2"></i>Repository Name: <code>case-management-data</code></li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Visibility: Private (recommended)</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Initialize: ✅ Add README</li>
+                                        </ul>
+                                        <a href="https://github.com/new" target="_blank" class="btn btn-primary btn-sm">
+                                            <i class="fab fa-github me-1"></i>Create Repository
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-warning h-100">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="mb-0">Step 2: Access Token</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Generate Personal Access Token:</strong></p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success me-2"></i>Go to GitHub Settings</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Developer settings → PATs</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Scope: <code>repo</code></li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Copy token securely</li>
+                                        </ul>
+                                        <a href="https://github.com/settings/tokens" target="_blank" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-key me-1"></i>Generate Token
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-success h-100">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">Step 3: Configure</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Setup in application:</strong></p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success me-2"></i>Login to system</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Go to Exports page</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Enter GitHub details</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Test connection</li>
+                                        </ul>
+                                        <div class="alert alert-success">
+                                            <small><i class="fas fa-shield-alt me-1"></i>Token stored securely in browser only</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Overview -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0"><i class="fas fa-star me-2"></i>Key Features</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-gavel text-primary me-2"></i>Case Management</h5>
+                                <ul>
+                                    <li>Complete case lifecycle tracking</li>
+                                    <li>Detailed case information forms</li>
+                                    <li>Party management (Petitioners/Respondents)</li>
+                                    <li>IA, USR, and connected matters</li>
+                                    <li>Document upload to GitHub</li>
+                                    <li>Order tracking and management</li>
+                                </ul>
+
+                                <h5><i class="fas fa-users text-success me-2"></i>User Management</h5>
+                                <ul>
+                                    <li>Role-based access control</li>
+                                    <li>Admin, Restricted Admin, Viewer roles</li>
+                                    <li>Secure authentication</li>
+                                    <li>Profile management</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-tasks text-warning me-2"></i>Task & Invoice</h5>
+                                <ul>
+                                    <li>Task assignment and tracking</li>
+                                    <li>Due date management</li>
+                                    <li>Invoice request and approval</li>
+                                    <li>Financial tracking</li>
+                                </ul>
+
+                                <h5><i class="fab fa-github text-dark me-2"></i>GitHub Integration</h5>
+                                <ul>
+                                    <li>Automatic data synchronization</li>
+                                    <li>File upload as GitHub assets</li>
+                                    <li>Real-time sync across devices</li>
+                                    <li>Secure token-based authentication</li>
+                                    <li>Fallback to localStorage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security & Access -->
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security & Access Control</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h5 class="text-danger">Admin Role</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Full Case Management
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        User Management
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Invoice Approval
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        GitHub Sync
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="text-warning">Restricted Admin</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Case & Task Management
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        User Management
+                                        <span class="badge bg-danger rounded-pill">✗</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Invoice Requests
+                                        <span class="badge bg-warning rounded-pill">Request Only</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Reports & Analytics
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="text-info">Viewer Role</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        View Cases & Tasks
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Edit/Delete Data
+                                        <span class="badge bg-danger rounded-pill">✗</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        User Management
+                                        <span class="badge bg-danger rounded-pill">✗</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        View Reports
+                                        <span class="badge bg-success rounded-pill">✓</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="mb-0"><i class="fas fa-cog me-2"></i>Technical Implementation</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Frontend Technologies</h5>
+                                <ul>
+                                    <li><strong>Bootstrap 5:</strong> Responsive UI framework</li>
+                                    <li><strong>Font Awesome 6:</strong> Icon library</li>
+                                    <li><strong>Chart.js:</strong> Data visualization</li>
+                                    <li><strong>jsPDF:</strong> PDF generation</li>
+                                    <li><strong>Vanilla JavaScript:</strong> No dependencies</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Data & Sync</h5>
+                                <ul>
+                                    <li><strong>GitHub API:</strong> Data persistence</li>
+                                    <li><strong>localStorage:</strong> Fallback storage</li>
+                                    <li><strong>JSON Format:</strong> Structured data</li>
+                                    <li><strong>File Upload:</strong> GitHub Contents API</li>
+                                    <li><strong>Real-time Sync:</strong> Automatic synchronization</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="text-center">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h4><i class="fas fa-rocket me-2"></i>Ready to Get Started?</h4>
+                            <p class="mb-3">Access your enhanced case management system now!</p>
+                            <a href="index.html" class="btn btn-light btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to System
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        Enhanced Case Management System v2.0 | 
+                        Built by <strong>MiniMax Agent</strong> | 
+                        <i class="fas fa-calendar-alt me-1"></i>September 2025
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

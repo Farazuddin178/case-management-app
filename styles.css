@@ -1023,6 +1023,151 @@ body {
     }
 }
 
+/* Case Details Styles - Required by user */
+.case-status { 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 0.875em; 
+}
+
+.status-open { 
+    background-color: #d1ecf1; 
+    color: #0c5460; 
+}
+
+.status-pending { 
+    background-color: #fff3cd; 
+    color: #856404; 
+}
+
+.status-closed { 
+    background-color: #d4edda; 
+    color: #155724; 
+}
+
+.minimalistBlack { 
+    border: 2px solid #000; 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.minimalistBlack th, .minimalistBlack td { 
+    border: 1px solid #000; 
+    padding: 8px; 
+    text-align: left; 
+}
+
+.thstyle { 
+    background-color: #f2f2f2; 
+}
+
+.tdstyle { 
+    background-color: #f9f9f9; 
+}
+
+.B2U-article { 
+    border: 1px solid #ccc; 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.B2U-article th, .B2U-article td { 
+    border: 1px solid #ccc; 
+    padding: 5px; 
+    text-align: left; 
+}
+
+.field-group { 
+    margin-bottom: 10px; 
+}
+
+.dynamic-field { 
+    border: 1px solid #dee2e6; 
+    padding: 15px; 
+    border-radius: 5px; 
+    margin-bottom: 10px; 
+    background-color: #f8f9fa; 
+}
+
+#notification { 
+    position: fixed; 
+    top: 20px; 
+    right: 20px; 
+    z-index: 1050; 
+    transition: opacity 0.3s; 
+}
+
+.nav-link.active { 
+    background-color: #495057; 
+}
+
+.notification.show { 
+    opacity: 1; 
+    transform: translateX(0); 
+}
+
+/* GitHub Sync Status Indicator */
+.sync-status {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+.sync-status.connected {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sync-status.disconnected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.sync-status i {
+    margin-right: 4px;
+}
+
+/* Dynamic Section Styles */
+.dynamic-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    transition: var(--transition);
+}
+
+.dynamic-section:hover {
+    box-shadow: var(--shadow-light);
+    border-color: var(--accent);
+}
+
+.dynamic-section .remove-dynamic-field {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.8rem;
+}
+
+.section-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--accent);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
 /* Search and Filter Enhancements */
 .search-filter-container {
     background: white;
