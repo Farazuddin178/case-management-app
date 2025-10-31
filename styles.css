@@ -1070,63 +1070,169 @@ body {
 
 /* Medium Devices (small desktops, 769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
+    .mobile-header {
+        display: none;
+    }
+
+    .backdrop {
+        display: none !important;
+    }
+
     .sidebar {
         width: 220px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(0);
     }
-    
+
+    .sidebar-footer {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+    }
+
     .main-content {
         margin-left: 220px;
         padding: 25px;
+        min-height: 100vh;
     }
-    
+
     .stat-card {
         padding: 20px;
+        flex-direction: row;
+        text-align: left;
+        margin-bottom: 15px;
     }
-    
+
+    .stat-card i {
+        margin-right: 20px;
+        margin-bottom: 0;
+        font-size: 2.2rem;
+    }
+
     .stat-card .number {
         font-size: 2rem;
     }
-    
+
+    .card {
+        margin-bottom: 20px;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
     .table th,
     .table td {
         padding: 12px 10px;
     }
-    
+
     .case-section {
         padding: 18px;
     }
-    
-    /* Hide mobile header on larger screens */
-    .mobile-header {
-        display: none;
+
+    .case-details-table th,
+    .case-details-table td {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 1rem;
     }
 }
 
 /* Large Devices (desktops, > 1024px) */
 @media (min-width: 1025px) {
-    .main-content {
-        padding: 40px;
-    }
-    
-    .stat-card {
-        padding: 30px;
-    }
-    
-    .stat-card .number {
-        font-size: 2.5rem;
-    }
-    
-    .card-body {
-        padding: 2rem;
-    }
-    
-    /* Hide mobile header on larger screens */
     .mobile-header {
         display: none;
     }
-    
+
     .backdrop {
         display: none !important;
+    }
+
+    .sidebar {
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(0);
+    }
+
+    .sidebar-footer {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 40px;
+        min-height: 100vh;
+    }
+
+    .stat-card {
+        padding: 30px;
+        flex-direction: row;
+        text-align: left;
+        margin-bottom: 20px;
+    }
+
+    .stat-card i {
+        margin-right: 20px;
+        margin-bottom: 0;
+        font-size: 2.5rem;
+    }
+
+    .stat-card .number {
+        font-size: 2.5rem;
+    }
+
+    .card {
+        margin-bottom: 25px;
+    }
+
+    .card-header {
+        padding: 20px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table {
+        font-size: 1rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 15px;
+    }
+
+    .case-details-table th,
+    .case-details-table td {
+        padding: 15px;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+
+    .notification {
+        max-width: 450px;
+        right: 30px;
+        bottom: 30px;
     }
 }
 
