@@ -785,17 +785,32 @@ function updateSyncStatusIndicator() {
     }
 }
 
-// Update last sync info
-function updateLastSyncInfo() {
+// Update last sync info with sync status messages
+function updateLastSyncInfo(syncResult) {
     const lastSyncEl = document.getElementById('lastSyncInfo');
+    const syncStatusEl = document.getElementById('syncStatusText');
     if (!lastSyncEl || !githubSync) return;
-    
+
     const status = githubSync.getSyncStatus();
     if (status.lastSync) {
         const date = new Date(status.lastSync);
         lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
     } else {
         lastSyncEl.textContent = 'Last sync: Never';
+    }
+
+    // Update sync status text based on result
+    if (syncStatusEl) {
+        if (!githubSync.isConfigured) {
+            syncStatusEl.textContent = 'Not configured — saving locally';
+        } else if (syncResult) {
+            const timestamp = new Date().toLocaleTimeString();
+            if (syncResult.mode === 'github' && syncResult.success) {
+                syncStatusEl.textContent = `Synced to GitHub at ${timestamp}`;
+            } else if (syncResult.error || syncResult.mode === 'localStorage') {
+                syncStatusEl.textContent = `Sync failed — stored locally (${timestamp})`;
+            }
+        }
     }
 }
 
