@@ -857,5 +857,454 @@
         }
     }
     </style>
+
+    <!-- Phase 1 Implementation: File Persistence Fix, Data Merge, Background Retry -->
+    <script>
+    /**
+     * PHASE 1 IMPLEMENTATION
+     * Component 2: Fix file persistence race condition
+     * Component 3: Merge pending + remote data on app load
+     * Component 4: Background retry with exponential backoff
+     */
+
+    // ============================================================================
+    // COMPONENT 2: Fix File Persistence Race Condition
+    // ============================================================================
+
+    // Store pending uploads in localStorage with unique key
+    const PENDING_UPLOADS_KEY = 'caseManager_pendingUploads';
+
+    /**
+     * Enhanced upload handler wrapper - fixes race condition
+     * Wraps existing upload functionality to ensure fileUrl is set before saving
+     * Called after existing upload completes
+     */
+    function setupUploadPersistenceFix() {
+        // Store original upload handler reference
+        const originalUploadForm = document.getElementById('uploadFileForm');
+        if (!originalUploadForm) return;
+
+        // Override the form submission to use our enhanced handler
+        originalUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileUpload');
+            const descriptionInput = document.getElementById('fileDescription');
+            const uploadBtn = document.getElementById('uploadFileSubmitBtn');
+
+            if (!fileInput.files.length) {
+                showNotification('Please select a file', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const description = descriptionInput.value || '';
+            const originalBtnText = uploadBtn.innerHTML;
+
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+                const startTime = Date.now();
+                let fileUrl = null;
+                let filePath = null;
+                let uploadStatus = 'completed';
+
+                // Attempt GitHub upload if configured
+                if (githubSync && githubSync.isConfigured) {
+                    try {
+                        const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
+                        fileUrl = uploadResult.url;
+                        filePath = uploadResult.path;
+                        uploadStatus = 'completed';
+                        showNotification(`File uploaded to GitHub in ${((Date.now() - startTime) / 1000).toFixed(1)}s`, 'success');
+                    } catch (githubError) {
+                        console.warn('GitHub upload failed, marking as pending:', githubError);
+                        uploadStatus = 'pending';
+                        // Read file as base64 for local storage
+                        fileUrl = await readFileAsBase64(file);
+                        filePath = `uploads/${Date.now()}_${sanitizeFilename(file.name)}`;
+                        showNotification('Saved locally (GitHub unavailable)', 'warning');
+                    }
+                } else {
+                    // No GitHub configured - save locally
+                    uploadStatus = 'pending';
+                    fileUrl = await readFileAsBase64(file);
+                    filePath = `uploads/${Date.now()}_${sanitizeFilename(file.name)}`;
+                    showNotification('Saving locally', 'info');
+                }
+
+                // CRITICAL: Only push to officeFiles AFTER file is ready
+                const fileData = {
+                    id: generateId(),
+                    fileName: file.name,
+                    fileSize: formatFileSize(file.size),
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    uploadedBy: currentUser.id,
+                    description: description,
+                    filePath: filePath,
+                    fileUrl: fileUrl,
+                    createdAt: new Date().toISOString(),
+                    status: uploadStatus,
+                    pendingUpload: uploadStatus === 'pending',
+                    retryCount: 0,
+                    lastRetryTime: null
+                };
+
+                // Push to officeFiles only after everything is set
+                officeFiles.push(fileData);
+
+                // If pending, store in localStorage for retry
+                if (uploadStatus === 'pending') {
+                    savePendingUpload(fileData, fileUrl);
+                }
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
+                if (modal) modal.hide();
+
+                // Reset form
+                document.getElementById('uploadFileForm').reset();
+
+                // Refresh table
+                renderOfficeCopyTable();
+
+                // Sync to GitHub
+                await saveAllData();
+
+                // Update sync status
+                updateSyncStatusIndicator();
+                updateLastSyncInfo();
+
+                showNotification('File uploaded successfully and saved!', 'success');
+
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                showNotification('Failed to upload file: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = originalBtnText;
+            }
+        }, { once: false });
+    }
+
+    /**
+     * Helper: Read file as base64
+     */
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Helper: Sanitize filename for GitHub
+     */
+    function sanitizeFilename(filename) {
+        return filename
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9\-_.]/g, '')
+            .substring(0, 255);
+    }
+
+    /**
+     * Helper: Generate unique ID
+     */
+    function generateId() {
+        return `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Save pending upload to localStorage for retry
+     */
+    function savePendingUpload(fileData, base64Content) {
+        let pendingQueue = getPendingUploadsQueue();
+
+        pendingQueue.uploads.push({
+            fileData: fileData,
+            base64Content: base64Content,
+            attempts: 0,
+            nextRetryTime: new Date().toISOString(),
+            backoffExponent: 0
+        });
+
+        pendingQueue.lastChecked = new Date().toISOString();
+        localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+    }
+
+    /**
+     * Get pending uploads queue from localStorage
+     */
+    function getPendingUploadsQueue() {
+        const stored = localStorage.getItem(PENDING_UPLOADS_KEY);
+        if (!stored) {
+            return {
+                uploads: [],
+                lastChecked: new Date().toISOString()
+            };
+        }
+        return JSON.parse(stored);
+    }
+
+    /**
+     * Update pending upload status
+     */
+    function updatePendingUploadStatus(fileId, newStatus, incrementRetry = false) {
+        let pendingQueue = getPendingUploadsQueue();
+
+        const uploadIndex = pendingQueue.uploads.findIndex(u => u.fileData.id === fileId);
+        if (uploadIndex !== -1) {
+            if (newStatus === 'completed') {
+                pendingQueue.uploads.splice(uploadIndex, 1);
+            } else if (incrementRetry) {
+                pendingQueue.uploads[uploadIndex].attempts++;
+                pendingQueue.uploads[uploadIndex].backoffExponent = Math.min(
+                    pendingQueue.uploads[uploadIndex].attempts,
+                    5 // max 5 retries
+                );
+                // Calculate next retry time: exponential backoff (1, 2, 4, 8, 16 minutes)
+                const backoffMinutes = Math.pow(2, pendingQueue.uploads[uploadIndex].backoffExponent - 1);
+                pendingQueue.uploads[uploadIndex].nextRetryTime = new Date(
+                    Date.now() + backoffMinutes * 60 * 1000
+                ).toISOString();
+            }
+        }
+
+        localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+    }
+
+    // ============================================================================
+    // COMPONENT 3: Merge Pending + Remote Data on App Load
+    // ============================================================================
+
+    /**
+     * Merge local pending uploads with remote GitHub data
+     * Called after githubSync.loadData() in initializeData()
+     */
+    function mergeRemoteAndPendingData() {
+        const pendingQueue = getPendingUploadsQueue();
+
+        // For each pending upload, check if it's already in officeFiles (synced by another instance)
+        pendingQueue.uploads.forEach(pending => {
+            const alreadySynced = officeFiles.find(f => f.filePath === pending.fileData.filePath);
+
+            if (!alreadySynced) {
+                // Add pending file to officeFiles with pending badge
+                officeFiles.push(pending.fileData);
+            }
+        });
+
+        // Remove synced items from pending queue
+        const remainingUploads = pendingQueue.uploads.filter(pending => {
+            return !officeFiles.find(f =>
+                f.filePath === pending.fileData.filePath && f.status === 'completed'
+            );
+        });
+
+        if (remainingUploads.length < pendingQueue.uploads.length) {
+            pendingQueue.uploads = remainingUploads;
+            localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+        }
+    }
+
+    // ============================================================================
+    // COMPONENT 4: Background Retry with Exponential Backoff
+    // ============================================================================
+
+    let retryIntervalId = null;
+
+    /**
+     * Initialize background retry mechanism
+     * Checks every 30 seconds for pending uploads and retries if conditions met
+     */
+    function initBackgroundRetry() {
+        if (retryIntervalId) clearInterval(retryIntervalId);
+
+        // Check immediately on init
+        checkAndRetryPendingUploads();
+
+        // Then check every 30 seconds
+        retryIntervalId = setInterval(checkAndRetryPendingUploads, 30000);
+    }
+
+    /**
+     * Check and retry pending uploads
+     */
+    async function checkAndRetryPendingUploads() {
+        if (!githubSync || !githubSync.isConfigured) {
+            return; // Skip if GitHub not configured
+        }
+
+        const pendingQueue = getPendingUploadsQueue();
+        const now = new Date();
+
+        for (const pending of pendingQueue.uploads) {
+            const nextRetryTime = new Date(pending.nextRetryTime);
+
+            // Skip if not yet time to retry
+            if (now < nextRetryTime) {
+                continue;
+            }
+
+            // Max retries exceeded?
+            if (pending.attempts >= 5) {
+                continue; // Will be marked as failed, user can manually retry
+            }
+
+            try {
+                // Retry upload
+                console.log(`[Retry] Attempting to upload ${pending.fileData.fileName} (attempt ${pending.attempts + 1})`);
+
+                // Convert base64 back to blob for upload
+                const blob = dataURLtoBlob(pending.base64Content);
+                const file = new File([blob], pending.fileData.fileName, { type: blob.type });
+
+                const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
+
+                // Update fileData with successful upload
+                const fileIndex = officeFiles.findIndex(f => f.id === pending.fileData.id);
+                if (fileIndex !== -1) {
+                    officeFiles[fileIndex].fileUrl = uploadResult.url;
+                    officeFiles[fileIndex].filePath = uploadResult.path;
+                    officeFiles[fileIndex].status = 'completed';
+                    officeFiles[fileIndex].pendingUpload = false;
+                }
+
+                // Remove from pending queue and save
+                updatePendingUploadStatus(pending.fileData.id, 'completed');
+
+                // Persist changes
+                await saveAllData();
+                renderOfficeCopyTable();
+
+                console.log(`[Retry] Successfully synced ${pending.fileData.fileName}`);
+                showNotification(`File synced: ${pending.fileData.fileName}`, 'success');
+
+            } catch (error) {
+                console.warn(`[Retry] Failed to upload ${pending.fileData.fileName}:`, error.message);
+
+                // Update retry count and backoff
+                updatePendingUploadStatus(pending.fileData.id, 'pending', true);
+
+                // Mark as failed if max retries reached
+                const updatedQueue = getPendingUploadsQueue();
+                const uploadItem = updatedQueue.uploads.find(u => u.fileData.id === pending.fileData.id);
+
+                if (uploadItem && uploadItem.attempts >= 5) {
+                    const fileIndex = officeFiles.findIndex(f => f.id === pending.fileData.id);
+                    if (fileIndex !== -1) {
+                        officeFiles[fileIndex].status = 'failed';
+                    }
+                }
+            }
+        }
+
+        // Update sync status
+        updateSyncStatusIndicator();
+    }
+
+    /**
+     * Helper: Convert data URL to blob
+     */
+    function dataURLtoBlob(dataURL) {
+        const parts = dataURL.split(',');
+        const bstr = atob(parts[1]);
+        const ab = new ArrayBuffer(bstr.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < bstr.length; i++) {
+            ia[i] = bstr.charCodeAt(i);
+        }
+        return new Blob([ab], { type: 'application/octet-stream' });
+    }
+
+    // ============================================================================
+    // INITIALIZATION & INTEGRATION
+    // ============================================================================
+
+    /**
+     * Hook into existing application initialization
+     * Called after DOMContentLoaded to integrate Phase 1 features
+     */
+    function initializePhase1() {
+        // Wait for app to be ready (DOMContentLoaded + modals loaded)
+        setTimeout(() => {
+            try {
+                // Component 2: Setup upload persistence fix
+                setupUploadPersistenceFix();
+
+                // Component 3: Merge pending data (called after data load)
+                // This will be integrated into the data load flow
+
+                // Component 4: Start background retry
+                initBackgroundRetry();
+
+                console.log('[Phase 1] File persistence, merge, and retry features initialized');
+            } catch (error) {
+                console.error('[Phase 1] Initialization error:', error);
+            }
+        }, 500);
+    }
+
+    /**
+     * Hook into existing initializeData function
+     * Wrap the original to add our merge logic
+     */
+    const originalInitializeData = window.initializeData;
+    if (originalInitializeData && typeof originalInitializeData === 'function') {
+        window.initializeData = async function() {
+            // Call original
+            await originalInitializeData.call(this);
+
+            // Add our merge logic after data is loaded
+            mergeRemoteAndPendingData();
+
+            // Re-render office copy table to include pending files
+            if (typeof renderOfficeCopyTable === 'function') {
+                renderOfficeCopyTable();
+            }
+        };
+    }
+
+    /**
+     * Update renderOfficeCopyTable to show pending/failed status badges
+     */
+    const originalRenderOfficeCopyTable = window.renderOfficeCopyTable;
+    if (originalRenderOfficeCopyTable && typeof originalRenderOfficeCopyTable === 'function') {
+        window.renderOfficeCopyTable = function() {
+            // Call original
+            originalRenderOfficeCopyTable.call(this);
+
+            // Add status badges for pending/failed files
+            officeFiles.forEach(file => {
+                const fileRow = document.querySelector(`tr[data-file-id="${file.id}"]`);
+                if (fileRow && file.pendingUpload) {
+                    const statusCell = fileRow.querySelector('td:nth-child(5)'); // Actions column
+                    if (statusCell && !statusCell.querySelector('.badge')) {
+                        if (file.status === 'pending') {
+                            statusCell.insertAdjacentHTML('beforeend',
+                                ' <span class="badge bg-warning ms-2">⏳ Pending</span>'
+                            );
+                        } else if (file.status === 'failed') {
+                            statusCell.insertAdjacentHTML('beforeend',
+                                ' <span class="badge bg-danger ms-2">✗ Failed</span>'
+                            );
+                        }
+                    }
+                }
+            });
+        };
+    }
+
+    // Initialize Phase 1 when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase1);
+    } else {
+        initializePhase1();
+    }
+    </script>
 </body>
 </html> 
