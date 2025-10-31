@@ -21,6 +21,8 @@
     --border-radius-lg: 12px;
     --transition: all 0.3s ease;
     --transition-fast: all 0.2s ease;
+    --sidebar-width: 250px;
+    --mobile-header-height: 64px;
 }
 
 /* Global Styles */
@@ -30,15 +32,21 @@
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
     color: #333;
     line-height: 1.6;
     overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
 }
 
-/* Mobile Header */
+/* Mobile Header - Rely on Bootstrap d-lg-none for display logic */
 .mobile-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     position: fixed;
@@ -47,11 +55,20 @@ body {
     right: 0;
     z-index: 1001;
     box-shadow: var(--shadow-medium);
+    /* Bootstrap d-lg-none handles visibility: block on <lg, none on >=lg */
 }
 
 /* Sidebar Backdrop */
-.backdrop {
+.backdrop,
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 999;
+    display: none; /* Shown via JS */
 }
 
 /* Sidebar Styles */
@@ -62,10 +79,11 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 250px;
+    width: var(--sidebar-width);
     box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: var(--transition);
+    overflow-y: auto; /* Ensure scrollable on smaller viewports */
 }
 
 .sidebar-brand {
@@ -115,6 +133,7 @@ body {
     right: 0;
     padding: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0; /* Prevent compression */
 }
 
 .sidebar-footer .btn {
@@ -127,9 +146,17 @@ body {
 .main-content {
     background-color: #f8f9fa;
     min-height: 100vh;
-    margin-left: 250px;
-    padding: 30px;
+    margin-left: var(--sidebar-width);
+    padding: 20px 30px 60px 30px; /* Unified padding, top reduced to 20px */
     transition: var(--transition);
+    position: relative;
+    top: 0;
+}
+
+/* Ensure page sections don't carry extra top margin that pushes content down */
+.page {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 
 /* Card Styles */
@@ -158,6 +185,7 @@ body {
 
 .card-body {
     padding: 1.5rem;
+    position: relative; /* For chart containers */
 }
 
 /* Dashboard Stats Cards */
@@ -326,6 +354,8 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow-light);
     background: white;
+    /* Ensure horizontal scroll on small screens without breaking layout */
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -348,11 +378,19 @@ body {
     vertical-align: middle;
     border-top: 1px solid #dee2e6;
     transition: var(--transition);
+    word-wrap: break-word; /* Prevent overflow */
 }
 
 .table tbody tr:hover {
     background-color: #f8f9fa;
     transform: scale(1.01);
+}
+
+/* Chart Canvas Responsiveness */
+.card-body canvas {
+    max-height: 250px !important;
+    height: auto !important;
+    width: 100% !important;
 }
 
 /* Case Status Styles */
@@ -470,6 +508,7 @@ body {
     border: 1px solid #dee2e6;
     text-align: left;
     vertical-align: top;
+    word-wrap: break-word;
 }
 
 .case-details-table th {
@@ -515,6 +554,7 @@ body {
     padding: 10px;
     border-bottom: 1px solid #dee2e6;
     font-size: 0.9rem;
+    word-wrap: break-word;
 }
 
 .ia-details-table tbody tr:hover {
@@ -528,6 +568,8 @@ body {
     box-shadow: var(--shadow-heavy);
     overflow: hidden;
     animation: modalSlideIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto; /* Ensure modals scroll on small screens */
 }
 
 @keyframes modalSlideIn {
@@ -546,6 +588,9 @@ body {
     color: white;
     border-bottom: none;
     padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .modal-title {
@@ -554,12 +599,17 @@ body {
 
 .modal-body {
     padding: 25px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px); /* Adjust for header/footer */
 }
 
 .modal-footer {
     background: #f8f9fa;
     border-top: 1px solid #dee2e6;
     padding: 15px 25px;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 /* Form Enhancements */
@@ -568,6 +618,7 @@ body {
     border: 2px solid #e9ecef;
     padding: 12px 15px;
     transition: var(--transition);
+    font-size: 16px; /* Prevent iOS zoom */
 }
 
 .form-control:focus {
@@ -587,6 +638,7 @@ body {
     border: 2px solid #e9ecef;
     padding: 12px 15px;
     transition: var(--transition);
+    font-size: 16px; /* Prevent iOS zoom */
 }
 
 .form-select:focus {
@@ -818,23 +870,57 @@ body {
 
 /* Responsive Design */
 
-/* Extra Small Devices (phones, < 480px) */
+/* Small Height Adjustments (for short viewports) */
+@media (max-height: 800px) {
+    .main-content {
+        padding: 10px 20px 40px 20px !important;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card .number {
+        font-size: 1.8rem;
+    }
+
+    .stat-card i {
+        font-size: 2rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-body canvas {
+        max-height: 180px !important;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra Small Devices (phones, < 481px) */
 @media (max-width: 480px) {
     .mobile-header {
-        height: auto;
+        display: flex !important; /* Force show on mobile, override any conflicts */
+        height: var(--mobile-header-height);
         z-index: 1003;
     }
 
     .sidebar {
-        width: 100%;
+        width: 100vw !important; /* Full width on mobile */
         transform: translateX(-100%);
         z-index: 1002;
-        height: auto;
-        max-height: 100vh;
+        height: 100vh;
         overflow-y: auto;
     }
 
-    .sidebar.show {
+    .sidebar.show,
+    body.sidebar-collapsed .sidebar {
         transform: translateX(0);
     }
 
@@ -852,10 +938,11 @@ body {
     }
 
     .main-content {
-        margin-left: 0;
+        margin-left: 0 !important;
         padding: 10px;
-        padding-top: 70px;
-        min-height: calc(100vh - 70px);
+        padding-top: calc(var(--mobile-header-height) + 10px); /* Account for fixed header */
+        min-height: calc(100vh - var(--mobile-header-height));
+        width: 100vw;
     }
 
     .stat-card {
@@ -888,6 +975,10 @@ body {
         padding: 1rem;
     }
 
+    .card-body canvas {
+        max-height: 150px !important;
+    }
+
     .table {
         font-size: 0.8rem;
     }
@@ -914,6 +1005,7 @@ body {
         padding: 8px 12px;
         font-size: 0.9rem;
         border-radius: 6px;
+        width: 100%; /* Full width buttons on mobile */
     }
 
     .btn-lg {
@@ -938,8 +1030,10 @@ body {
         font-size: 0.9rem;
     }
 
-    .backdrop {
+    .backdrop,
+    .sidebar-backdrop {
         z-index: 1001 !important;
+        display: block !important; /* Show backdrop on mobile when sidebar open */
     }
 
     /* Form improvements */
@@ -947,6 +1041,7 @@ body {
     .form-select {
         font-size: 16px; /* Prevents zoom on iOS */
         padding: 12px;
+        width: 100%;
     }
 
     /* Search filter on mobile */
@@ -958,25 +1053,32 @@ body {
     .search-filter-container .row > div {
         margin-bottom: 10px;
     }
+
+    /* Ensure no horizontal overflow */
+    .container,
+    .row {
+        overflow-x: hidden;
+    }
 }
 
 /* Small Devices (tablets, 481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     .mobile-header {
-        height: auto;
+        display: flex !important; /* Force show on tablet */
+        height: var(--mobile-header-height);
         z-index: 1003;
     }
 
     .sidebar {
-        width: 100%;
+        width: 100vw !important;
         transform: translateX(-100%);
         z-index: 1002;
-        height: auto;
-        max-height: 100vh;
+        height: 100vh;
         overflow-y: auto;
     }
 
-    .sidebar.show {
+    .sidebar.show,
+    body.sidebar-collapsed .sidebar {
         transform: translateX(0);
     }
 
@@ -989,10 +1091,11 @@ body {
     }
 
     .main-content {
-        margin-left: 0;
+        margin-left: 0 !important;
         padding: 15px;
-        padding-top: 70px;
-        min-height: calc(100vh - 70px);
+        padding-top: calc(var(--mobile-header-height) + 15px);
+        min-height: calc(100vh - var(--mobile-header-height));
+        width: 100vw;
     }
 
     .stat-card {
@@ -1023,6 +1126,10 @@ body {
 
     .card-body {
         padding: 1.25rem;
+    }
+
+    .card-body canvas {
+        max-height: 200px !important;
     }
 
     .table {
@@ -1056,7 +1163,8 @@ body {
         bottom: 20px;
     }
 
-    .backdrop {
+    .backdrop,
+    .sidebar-backdrop {
         z-index: 1001 !important;
     }
 
@@ -1071,10 +1179,11 @@ body {
 /* Medium Devices (small desktops, 769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .mobile-header {
-        display: none;
+        display: none !important; /* Hide on medium+ */
     }
 
-    .backdrop {
+    .backdrop,
+    .sidebar-backdrop {
         display: none !important;
     }
 
@@ -1085,6 +1194,15 @@ body {
         left: 0;
         height: 100vh;
         transform: translateX(0);
+        overflow-y: auto;
+    }
+
+    body.sidebar-collapsed .sidebar {
+        width: 60px; /* Collapsed width */
+    }
+
+    body.sidebar-collapsed .main-content {
+        margin-left: 60px;
     }
 
     .sidebar-footer {
@@ -1097,7 +1215,7 @@ body {
 
     .main-content {
         margin-left: 220px;
-        padding: 25px;
+        padding: 15px 25px 50px 25px; /* Reduced top padding */
         min-height: 100vh;
     }
 
@@ -1120,6 +1238,10 @@ body {
 
     .card {
         margin-bottom: 20px;
+    }
+
+    .card-body canvas {
+        max-height: 220px !important;
     }
 
     .table {
@@ -1150,10 +1272,11 @@ body {
 /* Large Devices (desktops, > 1024px) */
 @media (min-width: 1025px) {
     .mobile-header {
-        display: none;
+        display: none !important;
     }
 
-    .backdrop {
+    .backdrop,
+    .sidebar-backdrop {
         display: none !important;
     }
 
@@ -1164,6 +1287,15 @@ body {
         left: 0;
         height: 100vh;
         transform: translateX(0);
+        overflow-y: auto;
+    }
+
+    body.sidebar-collapsed .sidebar {
+        width: 60px; /* Collapsed width */
+    }
+
+    body.sidebar-collapsed .main-content {
+        margin-left: 60px;
     }
 
     .sidebar-footer {
@@ -1176,7 +1308,7 @@ body {
 
     .main-content {
         margin-left: 250px;
-        padding: 40px;
+        padding: 20px 40px 60px 40px; /* Reduced top padding to 20px */
         min-height: 100vh;
     }
 
@@ -1207,6 +1339,10 @@ body {
 
     .card-body {
         padding: 2rem;
+    }
+
+    .card-body canvas {
+        max-height: 250px !important;
     }
 
     .table {
@@ -1475,7 +1611,8 @@ body {
     .modal,
     .notification,
     .mobile-header,
-    .backdrop {
+    .backdrop,
+    .sidebar-backdrop {
         display: none !important;
     }
     

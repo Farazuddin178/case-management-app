@@ -2763,6 +2763,18 @@ function renderOfficeCopyTable() {
     });
 }
 
+/**
+ * Read a File object as DataURL (base64). Returns a promise that resolves with the data URL.
+ */
+function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+    });
+}
+
 async function uploadOfficeFile() {
     const fileInput = document.getElementById('fileUpload');
     const description = document.getElementById('fileDescription').value;
@@ -2801,27 +2813,30 @@ async function uploadOfficeFile() {
                 filePath = uploadResult.path;
 
                 showNotification(`File uploaded to GitHub in ${((Date.now() - startTime) / 1000).toFixed(1)}s`, 'success');
-            } catch (githubError) {
-                console.warn('GitHub upload failed, saving locally:', githubError);
-                // Store file locally with base64 encoding
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    fileUrl = e.target.result; // Base64 data
-                    filePath = `local_${Date.now()}_${file.name}`;
-                };
-                reader.readAsDataURL(file);
-
-                showNotification('Saved locally (GitHub unavailable)', 'warning');
+                } catch (githubError) {
+                    console.warn('GitHub upload failed, saving locally:', githubError);
+                    // Store file locally with base64 encoding (wait for reader)
+                    try {
+                        const base64 = await readFileAsDataURL(file);
+                        fileUrl = base64; // Base64 data
+                        filePath = `local_${Date.now()}_${file.name}`;
+                        showNotification('Saved locally (GitHub unavailable)', 'warning');
+                    } catch (rErr) {
+                        console.error('Failed to read file locally:', rErr);
+                        showNotification('Failed to save file locally', 'error');
+                    }
             }
         } else {
-            // Store file locally with base64 encoding
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                fileUrl = e.target.result; // Base64 data
-                filePath = `local_${Date.now()}_${file.name}`;
-            };
-            reader.readAsDataURL(file);
-            showNotification('Saving locally', 'info');
+                // Store file locally with base64 encoding (wait for reader)
+                try {
+                    const base64 = await readFileAsDataURL(file);
+                    fileUrl = base64;
+                    filePath = `local_${Date.now()}_${file.name}`;
+                    showNotification('Saving locally', 'info');
+                } catch (rErr) {
+                    console.error('Failed to read file locally:', rErr);
+                    showNotification('Failed to save file locally', 'error');
+                }
         }
 
         const fileData = {

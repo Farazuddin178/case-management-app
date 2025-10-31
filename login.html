@@ -163,7 +163,18 @@
         }
 
         function getDefaultUsers() {
-            return [];
+            // Provide a default admin user for first-run / demo mode so the
+            // application is accessible even when no remote/users data exists.
+            return [
+                {
+                    id: 1,
+                    username: 'admin',
+                    password: 'Admin123!',
+                    role: 'admin',
+                    email: 'admin@example.com',
+                    phone: '+1234567890'
+                }
+            ];
         }
 
         // Login form handler

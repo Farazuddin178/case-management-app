@@ -206,7 +206,7 @@
                             <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Case Status Distribution</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="caseStatusChart" height="250"></canvas>
+                            <canvas id="caseStatusChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -216,7 +216,7 @@
                             <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Cases by Year</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="casesByYearChart" height="250"></canvas>
+                            <canvas id="casesByYearChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                             <h5 class="mb-0"><i class="fas fa-chart-doughnut me-2"></i>Task Status</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="taskStatusChart" height="250"></canvas>
+                            <canvas id="taskStatusChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -385,7 +385,7 @@
                             <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Case Trends</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="caseTrendsChart" height="200"></canvas>
+                            <canvas id="caseTrendsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -395,7 +395,7 @@
                             <h5 class="mb-0"><i class="fas fa-pie-chart me-2"></i>Case Categories</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="caseCategoriesChart" height="200"></canvas>
+                            <canvas id="caseCategoriesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -813,37 +813,7 @@
     </div>
 
     <!-- Load Modals -->
-    <div id="modalsContainer"></div>
-
-    <style>
-    .section-title {
-        color: var(--primary);
-        font-weight: 600;
-        border-bottom: 2px solid var(--accent);
-        padding-bottom: 5px;
-        margin-bottom: 15px;
-        margin-top: 20px;
-    }
-
-    .section-title:first-child {
-        margin-top: 0;
-    }
-
-    .dynamic-section {
-        border: 1px solid #dee2e6;
-        border-radius: var(--border-radius);
-        padding: 15px;
-        margin-bottom: 10px;
-        background-color: #f8f9fa;
-        position: relative;
-    }
-
-    .remove-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-    </style>
+    <!-- <div id="modalsContainer"></div> -->
 
     <!-- Main Script -->
     <script src="script.js"></script>
@@ -854,18 +824,46 @@
             const sidebar = document.getElementById('sidebar');
             const mobileToggleBtn = document.getElementById('mobileToggleBtn');
             const backdrop = document.getElementById('sidebarBackdrop');
+            const backdropNew = document.getElementById('sidebarBackdropNew');
+
+            function showBackdrops(show) {
+                if (backdrop) {
+                    if (show) backdrop.classList.remove('d-none'); else backdrop.classList.add('d-none');
+                }
+                if (backdropNew) {
+                    backdropNew.style.display = show ? 'block' : 'none';
+                }
+            }
 
             if (mobileToggleBtn) {
                 mobileToggleBtn.addEventListener('click', function() {
+                    const body = document.body;
+                    // Keep both systems in sync: body.sidebar-collapsed and sidebar.show
+                    body.classList.toggle('sidebar-collapsed');
                     sidebar.classList.toggle('show');
-                    backdrop.classList.toggle('d-none');
+                    const isOpen = body.classList.contains('sidebar-collapsed');
+                    localStorage.setItem('sidebarCollapsed', isOpen);
+                    showBackdrops(isOpen);
                 });
             }
 
             if (backdrop) {
                 backdrop.addEventListener('click', function() {
+                    const body = document.body;
+                    body.classList.remove('sidebar-collapsed');
                     sidebar.classList.remove('show');
-                    backdrop.classList.add('d-none');
+                    localStorage.setItem('sidebarCollapsed', 'false');
+                    showBackdrops(false);
+                });
+            }
+
+            if (backdropNew) {
+                backdropNew.addEventListener('click', function() {
+                    const body = document.body;
+                    body.classList.remove('sidebar-collapsed');
+                    sidebar.classList.remove('show');
+                    localStorage.setItem('sidebarCollapsed', 'false');
+                    showBackdrops(false);
                 });
             }
 
@@ -874,16 +872,24 @@
             navLinks.forEach(link => {
                 link.addEventListener('click', function() {
                     if (window.innerWidth < 992) {
+                        const body = document.body;
+                        body.classList.remove('sidebar-collapsed');
                         sidebar.classList.remove('show');
-                        backdrop.classList.add('d-none');
+                        localStorage.setItem('sidebarCollapsed', 'false');
+                        showBackdrops(false);
                     }
                 });
             });
+
+            // Restore backdrop state from localStorage
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                showBackdrops(true);
+            }
         });
     </script>
 
     <!-- GitHub Sync & Responsive Fixes -->
-    <style>
+    <!-- <style>
     /* Hide manual GitHub config form - config now only via localStorage */
     #githubSettingsForm,
     [id*="githubOwner"],
@@ -1065,7 +1071,7 @@
             margin-top: 8px;
         }
     }
-    </style>
+    </style> -->
 
     <!-- Phase 1 Implementation: File Persistence Fix, Data Merge, Background Retry -->
     <script>
@@ -2054,4 +2060,4 @@
     }
     </script>
 </body>
-</html> 
+</html>
