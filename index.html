@@ -33,14 +33,40 @@
     <div class="mobile-header d-lg-none">
         <div class="d-flex justify-content-between align-items-center px-3 py-2">
             <h4 class="mb-0 text-white"><i class="fas fa-balance-scale me-2"></i>CMS</h4>
-            <button id="mobileToggleBtn" class="btn btn-light btn-sm">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="d-flex gap-2">
+                <!-- Sidebar toggle for tablet/mobile (new feature) -->
+                <button id="sidebarToggleBtnNew" class="btn btn-light btn-sm sidebar-toggle-btn" style="display: none;" title="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Profile dropdown for mobile (new feature) -->
+                <div class="navbar-profile-dropdown">
+                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="profileDropdownMobile" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownMobile">
+                        <li><span class="dropdown-header"><span id="mobileProfileUsername">User</span></span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="mobileProfileSettings" data-bs-toggle="modal" data-bs-target="#profileModal">
+                            <i class="fas fa-cog me-2"></i>Profile Settings
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="mobileLogoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+                <!-- Original mobile toggle btn -->
+                <button id="mobileToggleBtn" class="btn btn-light btn-sm d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Sidebar Backdrop for Mobile -->
     <div id="sidebarBackdrop" class="backdrop d-none"></div>
+    <!-- New sidebar backdrop for responsive collapse (Phase 3) -->
+    <div class="sidebar-backdrop" id="sidebarBackdropNew"></div>
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
