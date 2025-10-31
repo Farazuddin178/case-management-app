@@ -616,12 +616,15 @@ async function initializeData() {
             
             showNotification(`Data loaded successfully ${githubSync.isConfigured ? 'from GitHub' : 'from local storage'}`, 'success');
         } else {
-            // Fallback to default data
-            users = [
-                { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' },
-                { id: 2, username: 'manager', password: 'Manager123!', role: 'restricted_admin', email: 'manager@example.com', phone: '+1234567891' },
-                { id: 3, username: 'viewer', password: 'Viewer123!', role: 'viewer', email: 'viewer@example.com', phone: '+1234567892' }
-            ];
+            // Fallback to default data (ephemeral admin only when no users exist)
+            users = [];
+
+            // Create ephemeral admin user in memory only
+            if (users.length === 0) {
+                users = [
+                    { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' }
+                ];
+            }
             
             cases = [
                 { 
