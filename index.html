@@ -823,5 +823,39 @@
             });
         });
     </script>
+
+    <!-- GitHub Sync & Responsive Fixes -->
+    <style>
+    /* Hide manual GitHub config form - config now only via localStorage */
+    #githubSettingsForm,
+    [id*="githubOwner"],
+    [id*="githubRepo"],
+    [id*="githubBranch"],
+    [id*="githubToken"],
+    #saveGhSettings,
+    #testGhConnection,
+    #syncToGithub {
+        display: none !important;
+    }
+
+    /* Responsive fix: Prevent profile/logout buttons from overlapping sidebar menu on narrow viewports */
+    @media (max-width: 480px) {
+        .sidebar-footer {
+            position: relative;          /* Change from absolute to relative on mobile */
+            bottom: auto;                /* Remove bottom positioning */
+            margin-top: 1rem;            /* Add spacing from menu items */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    @media (min-width: 481px) {
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    }
+    </style>
 </body>
 </html> 
