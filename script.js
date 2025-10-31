@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             // Update sync status indicator
             updateSyncStatusIndicator();
+            updateLastSyncInfo();
         } else {
             showLoginScreen();
         }
