@@ -2734,22 +2734,28 @@ function loadOfficeCopyPage() {
 function renderOfficeCopyTable() {
     const tbody = document.querySelector('#officeCopyTable tbody');
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
+
     officeFiles.forEach(file => {
         const user = users.find(u => u.id === file.uploadedBy);
         const tr = document.createElement('tr');
-        
+        const isAdmin = currentUser.role === 'admin';
+        const isUploader = currentUser.id === file.uploadedBy;
+
         tr.innerHTML = `
             <td>${file.fileName}</td>
             <td>${file.fileSize}</td>
             <td>${formatDate(file.uploadDate)}</td>
             <td>${user ? user.username : 'Unknown'}</td>
             <td>
-                ${currentUser.role === 'admin' ? `
-                    <button class="btn btn-sm btn-outline-primary download-file-btn" data-id="${file.id}"><i class="fas fa-download"></i></button>
-                    <button class="btn btn-sm btn-outline-danger delete-file-btn" data-id="${file.id}"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-sm btn-outline-primary download-file-btn" data-id="${file.id}" title="Download">
+                    <i class="fas fa-download"></i>
+                </button>
+                ${isAdmin || isUploader ? `
+                    <button class="btn btn-sm btn-outline-danger delete-file-btn" data-id="${file.id}" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 ` : ''}
             </td>
         `;
