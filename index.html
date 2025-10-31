@@ -1338,5 +1338,349 @@
         initializePhase1();
     }
     </script>
+
+    <!-- Phase 2 Implementation: Upload Progress UI & Sync Status Enhancement -->
+    <script>
+    /**
+     * PHASE 2 IMPLEMENTATION
+     * Component 1: Upload progress UI with XMLHttpRequest and real-time metrics
+     * Component 4: Enhanced sync status indicator with pending upload counts
+     */
+
+    // ============================================================================
+    // COMPONENT 1: Upload Progress UI with XMLHttpRequest
+    // ============================================================================
+
+    // Track upload progress metrics
+    let uploadMetrics = {
+        speedHistory: [],
+        maxHistoryLength: 5,
+        intervalMs: 250
+    };
+
+    /**
+     * Initialize upload progress tracking with XMLHttpRequest
+     * Replaces simple upload with real-time progress monitoring
+     */
+    function setupUploadProgressTracking() {
+        const uploadBtn = document.getElementById('uploadFileSubmitBtn');
+        const progressContainer = document.getElementById('fileUploadProgressContainer');
+        const progressBar = document.getElementById('fileUploadProgressBar');
+        const percentSpan = document.getElementById('fileUploadPercent');
+        const bytesSpan = document.getElementById('fileUploadBytes');
+        const speedSpan = document.getElementById('fileUploadSpeed');
+        const etaSpan = document.getElementById('fileUploadETA');
+        const statusSpan = document.getElementById('fileUploadStatus');
+        const linkElement = document.getElementById('fileUploadLink');
+
+        if (!uploadBtn || !progressContainer) return;
+
+        // Wrap existing upload handler to inject progress tracking
+        const uploadForm = document.getElementById('uploadFileForm');
+        if (!uploadForm) return;
+
+        // Store original form handler
+        const originalSubmitHandler = uploadForm.onsubmit;
+
+        uploadForm.addEventListener('submit', async (e) => {
+            const fileInput = document.getElementById('fileUpload');
+
+            if (!fileInput.files.length) {
+                return; // Let original handler deal with this
+            }
+
+            const file = fileInput.files[0];
+
+            // Show progress UI
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            percentSpan.textContent = '0%';
+            bytesSpan.textContent = '0 B / 0 B';
+            speedSpan.textContent = '0 KB/s';
+            etaSpan.textContent = '--:--:--';
+            statusSpan.textContent = '📤 Uploading...';
+            linkElement.style.display = 'none';
+            uploadMetrics.speedHistory = [];
+
+            // Upload with progress tracking
+            await trackUploadProgress(file, uploadBtn, progressContainer, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan, statusSpan, linkElement);
+        });
+    }
+
+    /**
+     * Track upload progress using XMLHttpRequest
+     */
+    async function trackUploadProgress(file, uploadBtn, progressContainer, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan, statusSpan, linkElement) {
+        const totalBytes = file.size;
+        let uploadedBytes = 0;
+        const startTime = Date.now();
+
+        return new Promise(async (resolve) => {
+            try {
+                // Read file as ArrayBuffer for base64 encoding
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                const base64Content = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+
+                if (githubSync && githubSync.isConfigured) {
+                    // Use XMLHttpRequest for progress tracking
+                    uploadWithXHR(file, base64Content, arrayBuffer, {
+                        onProgress: (loaded, total) => {
+                            uploadedBytes = loaded;
+                            updateProgressUI(loaded, total, startTime, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan);
+                        },
+                        onSuccess: (result) => {
+                            statusSpan.innerHTML = '✅ Completed [' + new Date().toLocaleTimeString() + ']';
+                            progressBar.style.width = '100%';
+                            percentSpan.textContent = '100%';
+                            linkElement.href = result.url;
+                            linkElement.style.display = 'inline-block';
+                            resolve();
+                        },
+                        onError: (error) => {
+                            statusSpan.innerHTML = '⚠️ Saved locally (will sync)';
+                            resolve();
+                        }
+                    });
+                } else {
+                    // Offline: just track base64 encoding progress
+                    statusSpan.innerHTML = '💾 Saving locally...';
+                    progressBar.style.width = '100%';
+                    percentSpan.textContent = '100%';
+                    resolve();
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                statusSpan.innerHTML = '❌ Failed';
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * Helper: Read file as ArrayBuffer
+     */
+    function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    /**
+     * Upload file via XMLHttpRequest with progress events
+     */
+    function uploadWithXHR(file, base64Content, arrayBuffer, callbacks) {
+        const xhr = new XMLHttpRequest();
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${sanitizeFilename(file.name)}`;
+        const path = `office-copy/${fileName}`;
+
+        // Track progress events
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                callbacks.onProgress(e.loaded, e.total);
+            }
+        });
+
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200 || xhr.status === 201) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    callbacks.onSuccess({
+                        url: response.content.download_url,
+                        path: path,
+                        filename: fileName
+                    });
+                } catch (e) {
+                    callbacks.onError(e);
+                }
+            } else {
+                callbacks.onError(new Error(`HTTP ${xhr.status}`));
+            }
+        });
+
+        xhr.addEventListener('error', () => {
+            callbacks.onError(new Error('Upload failed'));
+        });
+
+        // Construct GitHub API URL
+        const url = `https://api.github.com/repos/${githubSync.settings.owner}/${githubSync.settings.repo}/contents/${path}`;
+
+        // Get existing file SHA if it exists
+        const getExistingFile = async () => {
+            try {
+                const response = await fetch(url, {
+                    headers: githubSync.getHeaders()
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sha;
+                }
+            } catch (e) {}
+            return null;
+        };
+
+        // Upload file
+        (async () => {
+            try {
+                const sha = await getExistingFile();
+                const body = {
+                    message: `Upload ${file.name}`,
+                    content: base64Content,
+                    branch: githubSync.settings.branch
+                };
+
+                if (sha) {
+                    body.sha = sha;
+                }
+
+                xhr.open('PUT', url);
+                xhr.setRequestHeader('Authorization', `token ${githubSync.settings.token}`);
+                xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(body));
+            } catch (error) {
+                callbacks.onError(error);
+            }
+        })();
+    }
+
+    /**
+     * Update progress UI with real-time metrics
+     */
+    function updateProgressUI(loaded, total, startTime, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan) {
+        const elapsed = (Date.now() - startTime) / 1000; // seconds
+        const percent = (loaded / total) * 100;
+
+        // Update progress bar
+        progressBar.style.width = percent + '%';
+        progressBar.setAttribute('aria-valuenow', Math.floor(percent));
+        percentSpan.textContent = Math.floor(percent) + '%';
+
+        // Update bytes
+        bytesSpan.textContent = formatBytes(loaded) + ' / ' + formatBytes(total);
+
+        // Calculate speed (rolling average)
+        const now = Date.now();
+        uploadMetrics.speedHistory.push({ time: now, bytes: loaded });
+
+        // Remove old entries (older than 1.25 seconds)
+        while (uploadMetrics.speedHistory.length > 1 &&
+               uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].time -
+               uploadMetrics.speedHistory[0].time > 1250) {
+            uploadMetrics.speedHistory.shift();
+        }
+
+        // Calculate speed from history
+        if (uploadMetrics.speedHistory.length > 1) {
+            const timespan = (uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].time -
+                            uploadMetrics.speedHistory[0].time) / 1000; // seconds
+            const bytesDiff = uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].bytes -
+                            uploadMetrics.speedHistory[0].bytes;
+            const speedBytesPerSec = bytesDiff / timespan;
+            const speedKBPerSec = speedBytesPerSec / 1024;
+
+            speedSpan.textContent = speedKBPerSec.toFixed(0) + ' KB/s';
+
+            // Calculate ETA
+            const bytesRemaining = total - loaded;
+            const etaSeconds = Math.floor(bytesRemaining / speedBytesPerSec);
+            etaSpan.textContent = formatSeconds(etaSeconds);
+        }
+    }
+
+    /**
+     * Helper: Format bytes to human readable
+     */
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    /**
+     * Helper: Format seconds to HH:MM:SS
+     */
+    function formatSeconds(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return [hours, minutes, secs]
+            .map(x => String(x).padStart(2, '0'))
+            .join(':');
+    }
+
+    // ============================================================================
+    // COMPONENT 4: Enhanced Sync Status Indicator
+    // ============================================================================
+
+    /**
+     * Update sync status with pending upload info
+     */
+    function enhanceSyncStatusIndicator() {
+        const pendingQueue = getPendingUploadsQueue();
+        const syncStatusText = document.getElementById('syncStatusText');
+        const syncStatusArea = document.getElementById('syncStatusArea');
+
+        if (!syncStatusText || !syncStatusArea) return;
+
+        if (!githubSync || !githubSync.isConfigured) {
+            syncStatusText.textContent = '⚪ Not configured — saving locally';
+            return;
+        }
+
+        const pendingCount = pendingQueue.uploads.length;
+        const timestamp = new Date().toLocaleTimeString();
+
+        if (pendingCount === 0) {
+            syncStatusText.innerHTML = `✅ Synced — ${timestamp}`;
+            syncStatusArea.style.color = '#28a745';
+        } else {
+            const failedCount = pendingQueue.uploads.filter(u => u.attempts >= 5).length;
+
+            if (failedCount > 0) {
+                syncStatusText.innerHTML = `⚠️ Sync failed — ${failedCount} item(s) stored locally (${timestamp})`;
+                syncStatusArea.style.color = '#dc3545';
+            } else {
+                syncStatusText.innerHTML = `⟳ Syncing... ${pendingCount} pending upload(s)`;
+                syncStatusArea.style.color = '#ffc107';
+            }
+        }
+    }
+
+    // ============================================================================
+    // PHASE 2 INITIALIZATION
+    // ============================================================================
+
+    function initializePhase2() {
+        setTimeout(() => {
+            try {
+                // Component 1: Setup upload progress tracking
+                setupUploadProgressTracking();
+
+                // Component 4: Update sync status
+                enhanceSyncStatusIndicator();
+
+                // Update sync status every 5 seconds
+                setInterval(enhanceSyncStatusIndicator, 5000);
+
+                console.log('[Phase 2] Upload progress UI and sync status initialized');
+            } catch (error) {
+                console.error('[Phase 2] Initialization error:', error);
+            }
+        }, 1000);
+    }
+
+    // Initialize when Phase 1 is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase2);
+    } else {
+        setTimeout(initializePhase2, 1000);
+    }
+    </script>
 </body>
 </html> 
