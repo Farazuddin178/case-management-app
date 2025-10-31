@@ -2760,25 +2760,64 @@ function renderOfficeCopyTable() {
 async function uploadOfficeFile() {
     const fileInput = document.getElementById('fileUpload');
     const description = document.getElementById('fileDescription').value;
-    
+
     if (!fileInput.files.length) {
         showNotification('Please select a file', 'error');
         return;
     }
-    
+
     const file = fileInput.files[0];
-    
+    const uploadBtn = document.getElementById('uploadFileSubmitBtn');
+    const originalBtnText = uploadBtn.innerHTML;
+
     try {
+        // Show progress indicator
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+        const startTime = Date.now();
         let fileUrl = null;
         let filePath = null;
-        
+
         // Upload to GitHub if configured
         if (githubSync && githubSync.isConfigured) {
-            const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
-            fileUrl = uploadResult.url;
-            filePath = uploadResult.path;
+            try {
+                // Show progress tracking
+                const progressInterval = setInterval(() => {
+                    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                    uploadBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>Uploading... (${elapsed}s)`;
+                }, 500);
+
+                const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
+                clearInterval(progressInterval);
+
+                fileUrl = uploadResult.url;
+                filePath = uploadResult.path;
+
+                showNotification(`File uploaded to GitHub in ${((Date.now() - startTime) / 1000).toFixed(1)}s`, 'success');
+            } catch (githubError) {
+                console.warn('GitHub upload failed, saving locally:', githubError);
+                // Store file locally with base64 encoding
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    fileUrl = e.target.result; // Base64 data
+                    filePath = `local_${Date.now()}_${file.name}`;
+                };
+                reader.readAsDataURL(file);
+
+                showNotification('Saved locally (GitHub unavailable)', 'warning');
+            }
+        } else {
+            // Store file locally with base64 encoding
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                fileUrl = e.target.result; // Base64 data
+                filePath = `local_${Date.now()}_${file.name}`;
+            };
+            reader.readAsDataURL(file);
+            showNotification('Saving locally', 'info');
         }
-        
+
         const fileData = {
             id: Date.now(),
             fileName: file.name,
@@ -2787,29 +2826,38 @@ async function uploadOfficeFile() {
             uploadedBy: currentUser.id,
             description: description,
             filePath: filePath,
-            fileUrl: fileUrl
+            fileUrl: fileUrl,
+            createdAt: new Date().toISOString()
         };
-        
+
         officeFiles.push(fileData);
-        
+
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
-        modal.hide();
-        
+        if (modal) modal.hide();
+
         // Reset form
         document.getElementById('uploadFileForm').reset();
-        
+
         // Refresh table
         renderOfficeCopyTable();
-        
+
         // Sync to GitHub
         await saveAllData();
-        
-        showNotification('File uploaded successfully!', 'success');
-        
+
+        // Update last sync
+        updateSyncStatusIndicator();
+        updateLastSyncInfo();
+
+        showNotification('File uploaded successfully and saved!', 'success');
+
     } catch (error) {
         console.error('Error uploading file:', error);
-        showNotification('Failed to upload file', 'error');
+        showNotification('Failed to upload file: ' + error.message, 'error');
+    } finally {
+        // Reset button
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = originalBtnText;
     }
 }
 
