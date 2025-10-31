@@ -50,7 +50,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Setup event listeners
         setupEventListeners();
-        
+
+        // Setup auto-sync hooks for CRUD operations
+        setupAutoSyncHooks();
+
         // Start reminder system
         startReminderSystem();
         
