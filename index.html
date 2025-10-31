@@ -33,14 +33,40 @@
     <div class="mobile-header d-lg-none">
         <div class="d-flex justify-content-between align-items-center px-3 py-2">
             <h4 class="mb-0 text-white"><i class="fas fa-balance-scale me-2"></i>CMS</h4>
-            <button id="mobileToggleBtn" class="btn btn-light btn-sm">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="d-flex gap-2">
+                <!-- Sidebar toggle for tablet/mobile (new feature) -->
+                <button id="sidebarToggleBtnNew" class="btn btn-light btn-sm sidebar-toggle-btn" style="display: none;" title="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Profile dropdown for mobile (new feature) -->
+                <div class="navbar-profile-dropdown">
+                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="profileDropdownMobile" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownMobile">
+                        <li><span class="dropdown-header"><span id="mobileProfileUsername">User</span></span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="mobileProfileSettings" data-bs-toggle="modal" data-bs-target="#profileModal">
+                            <i class="fas fa-cog me-2"></i>Profile Settings
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="mobileLogoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+                <!-- Original mobile toggle btn -->
+                <button id="mobileToggleBtn" class="btn btn-light btn-sm d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Sidebar Backdrop for Mobile -->
     <div id="sidebarBackdrop" class="backdrop d-none"></div>
+    <!-- New sidebar backdrop for responsive collapse (Phase 3) -->
+    <div class="sidebar-backdrop" id="sidebarBackdropNew"></div>
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -488,6 +514,38 @@
                 <i class="fas fa-info-circle me-2"></i>
                 <strong>Note:</strong> All users can upload and download files. Admins and file uploaders can delete files. Files are automatically synced to GitHub and persist across sessions.
             </div>
+
+            <!-- Phase 2: Upload Progress UI (Component 1) -->
+            <div id="fileUploadProgressContainer" style="display: none; margin-bottom: 20px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                <span id="fileUploadStatus">📤 Uploading...</span>
+                            </h6>
+                            <span id="fileUploadPercent">0%</span>
+                        </div>
+                        <div class="progress" style="height: 24px; margin-bottom: 10px;">
+                            <div id="fileUploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="row text-muted small">
+                            <div class="col-md-3">
+                                <strong>Bytes:</strong> <span id="fileUploadBytes">0 B / 0 B</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Speed:</strong> <span id="fileUploadSpeed">0 KB/s</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>ETA:</strong> <span id="fileUploadETA">--:--:--</span>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a id="fileUploadLink" href="#" style="display: none;">📥 View File</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="card">
                 <div class="card-body">
@@ -856,6 +914,1144 @@
             right: 0;
         }
     }
+
+    /* Phase 3: Responsive Overhaul CSS */
+
+    /* Tablet (768-1023px) and Mobile (<768px) Responsive Fixes */
+    @media (max-width: 1023px) {
+        /* Sidebar Collapse Management */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 1040;
+            transition: transform 0.3s ease;
+        }
+
+        body.sidebar-collapsed .sidebar {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar backdrop for mobile */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1030;
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-backdrop {
+            display: block;
+        }
+
+        /* Content area full width when sidebar collapsed */
+        .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Hamburger toggle button visibility */
+        .sidebar-toggle-btn {
+            display: inline-block !important;
+        }
+
+        /* Profile header dropdown (hide sidebar profile) */
+        .sidebar-footer {
+            display: none !important;
+        }
+
+        /* Modal responsiveness */
+        .modal-content {
+            max-width: 95vw;
+            max-height: 90vh;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(90vh - 180px);
+        }
+
+        /* Table responsiveness */
+        table {
+            font-size: 1rem;
+        }
+
+        table td, table th {
+            padding: 12px 8px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* Touch target sizing */
+        button, .btn {
+            min-height: 44px;
+            padding: 10px 16px !important;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            min-height: 40px;
+            padding: 10px !important;
+        }
+
+        .btn-sm {
+            min-height: 44px;
+            padding: 8px 12px !important;
+        }
+
+        /* Header profile dropdown styling */
+        .navbar-profile-dropdown {
+            display: none;
+        }
+
+        @media (max-width: 1023px) {
+            .navbar-profile-dropdown {
+                display: inline-block;
+            }
+        }
+    }
+
+    /* Desktop (≥1024px) - No changes, keep original */
+    @media (min-width: 1024px) {
+        .sidebar {
+            position: relative;
+            width: 250px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+        }
+
+        .sidebar-toggle-btn {
+            display: none !important;
+        }
+
+        .sidebar-backdrop {
+            display: none !important;
+        }
+
+        .navbar-profile-dropdown {
+            display: none !important;
+        }
+
+        .sidebar-footer {
+            display: block !important;
+        }
+    }
+
+    /* Animation for sidebar collapse/expand */
+    @media (max-width: 1023px) {
+        .sidebar {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    /* Progress bar animations */
+    @media (max-width: 767px) {
+        #fileUploadProgressContainer .row {
+            flex-direction: column;
+        }
+
+        #fileUploadProgressContainer .col-md-3 {
+            margin-top: 8px;
+        }
+    }
     </style>
+
+    <!-- Phase 1 Implementation: File Persistence Fix, Data Merge, Background Retry -->
+    <script>
+    /**
+     * PHASE 1 IMPLEMENTATION
+     * Component 2: Fix file persistence race condition
+     * Component 3: Merge pending + remote data on app load
+     * Component 4: Background retry with exponential backoff
+     */
+
+    // ============================================================================
+    // COMPONENT 2: Fix File Persistence Race Condition
+    // ============================================================================
+
+    // Store pending uploads in localStorage with unique key
+    const PENDING_UPLOADS_KEY = 'caseManager_pendingUploads';
+
+    /**
+     * Enhanced upload handler wrapper - fixes race condition
+     * Wraps existing upload functionality to ensure fileUrl is set before saving
+     * Called after existing upload completes
+     */
+    function setupUploadPersistenceFix() {
+        // Store original upload handler reference
+        const originalUploadForm = document.getElementById('uploadFileForm');
+        if (!originalUploadForm) return;
+
+        // Override the form submission to use our enhanced handler
+        originalUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileUpload');
+            const descriptionInput = document.getElementById('fileDescription');
+            const uploadBtn = document.getElementById('uploadFileSubmitBtn');
+
+            if (!fileInput.files.length) {
+                showNotification('Please select a file', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const description = descriptionInput.value || '';
+            const originalBtnText = uploadBtn.innerHTML;
+
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+                const startTime = Date.now();
+                let fileUrl = null;
+                let filePath = null;
+                let uploadStatus = 'completed';
+
+                // Attempt GitHub upload if configured
+                if (githubSync && githubSync.isConfigured) {
+                    try {
+                        const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
+                        fileUrl = uploadResult.url;
+                        filePath = uploadResult.path;
+                        uploadStatus = 'completed';
+                        showNotification(`File uploaded to GitHub in ${((Date.now() - startTime) / 1000).toFixed(1)}s`, 'success');
+                    } catch (githubError) {
+                        console.warn('GitHub upload failed, marking as pending:', githubError);
+                        uploadStatus = 'pending';
+                        // Read file as base64 for local storage
+                        fileUrl = await readFileAsBase64(file);
+                        filePath = `uploads/${Date.now()}_${sanitizeFilename(file.name)}`;
+                        showNotification('Saved locally (GitHub unavailable)', 'warning');
+                    }
+                } else {
+                    // No GitHub configured - save locally
+                    uploadStatus = 'pending';
+                    fileUrl = await readFileAsBase64(file);
+                    filePath = `uploads/${Date.now()}_${sanitizeFilename(file.name)}`;
+                    showNotification('Saving locally', 'info');
+                }
+
+                // CRITICAL: Only push to officeFiles AFTER file is ready
+                const fileData = {
+                    id: generateId(),
+                    fileName: file.name,
+                    fileSize: formatFileSize(file.size),
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    uploadedBy: currentUser.id,
+                    description: description,
+                    filePath: filePath,
+                    fileUrl: fileUrl,
+                    createdAt: new Date().toISOString(),
+                    status: uploadStatus,
+                    pendingUpload: uploadStatus === 'pending',
+                    retryCount: 0,
+                    lastRetryTime: null
+                };
+
+                // Push to officeFiles only after everything is set
+                officeFiles.push(fileData);
+
+                // If pending, store in localStorage for retry
+                if (uploadStatus === 'pending') {
+                    savePendingUpload(fileData, fileUrl);
+                }
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
+                if (modal) modal.hide();
+
+                // Reset form
+                document.getElementById('uploadFileForm').reset();
+
+                // Refresh table
+                renderOfficeCopyTable();
+
+                // Sync to GitHub
+                await saveAllData();
+
+                // Update sync status
+                updateSyncStatusIndicator();
+                updateLastSyncInfo();
+
+                showNotification('File uploaded successfully and saved!', 'success');
+
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                showNotification('Failed to upload file: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = originalBtnText;
+            }
+        }, { once: false });
+    }
+
+    /**
+     * Helper: Read file as base64
+     */
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Helper: Sanitize filename for GitHub
+     */
+    function sanitizeFilename(filename) {
+        return filename
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9\-_.]/g, '')
+            .substring(0, 255);
+    }
+
+    /**
+     * Helper: Generate unique ID
+     */
+    function generateId() {
+        return `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Save pending upload to localStorage for retry
+     */
+    function savePendingUpload(fileData, base64Content) {
+        let pendingQueue = getPendingUploadsQueue();
+
+        pendingQueue.uploads.push({
+            fileData: fileData,
+            base64Content: base64Content,
+            attempts: 0,
+            nextRetryTime: new Date().toISOString(),
+            backoffExponent: 0
+        });
+
+        pendingQueue.lastChecked = new Date().toISOString();
+        localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+    }
+
+    /**
+     * Get pending uploads queue from localStorage
+     */
+    function getPendingUploadsQueue() {
+        const stored = localStorage.getItem(PENDING_UPLOADS_KEY);
+        if (!stored) {
+            return {
+                uploads: [],
+                lastChecked: new Date().toISOString()
+            };
+        }
+        return JSON.parse(stored);
+    }
+
+    /**
+     * Update pending upload status
+     */
+    function updatePendingUploadStatus(fileId, newStatus, incrementRetry = false) {
+        let pendingQueue = getPendingUploadsQueue();
+
+        const uploadIndex = pendingQueue.uploads.findIndex(u => u.fileData.id === fileId);
+        if (uploadIndex !== -1) {
+            if (newStatus === 'completed') {
+                pendingQueue.uploads.splice(uploadIndex, 1);
+            } else if (incrementRetry) {
+                pendingQueue.uploads[uploadIndex].attempts++;
+                pendingQueue.uploads[uploadIndex].backoffExponent = Math.min(
+                    pendingQueue.uploads[uploadIndex].attempts,
+                    5 // max 5 retries
+                );
+                // Calculate next retry time: exponential backoff (1, 2, 4, 8, 16 minutes)
+                const backoffMinutes = Math.pow(2, pendingQueue.uploads[uploadIndex].backoffExponent - 1);
+                pendingQueue.uploads[uploadIndex].nextRetryTime = new Date(
+                    Date.now() + backoffMinutes * 60 * 1000
+                ).toISOString();
+            }
+        }
+
+        localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+    }
+
+    // ============================================================================
+    // COMPONENT 3: Merge Pending + Remote Data on App Load
+    // ============================================================================
+
+    /**
+     * Merge local pending uploads with remote GitHub data
+     * Called after githubSync.loadData() in initializeData()
+     */
+    function mergeRemoteAndPendingData() {
+        const pendingQueue = getPendingUploadsQueue();
+
+        // For each pending upload, check if it's already in officeFiles (synced by another instance)
+        pendingQueue.uploads.forEach(pending => {
+            const alreadySynced = officeFiles.find(f => f.filePath === pending.fileData.filePath);
+
+            if (!alreadySynced) {
+                // Add pending file to officeFiles with pending badge
+                officeFiles.push(pending.fileData);
+            }
+        });
+
+        // Remove synced items from pending queue
+        const remainingUploads = pendingQueue.uploads.filter(pending => {
+            return !officeFiles.find(f =>
+                f.filePath === pending.fileData.filePath && f.status === 'completed'
+            );
+        });
+
+        if (remainingUploads.length < pendingQueue.uploads.length) {
+            pendingQueue.uploads = remainingUploads;
+            localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pendingQueue));
+        }
+    }
+
+    // ============================================================================
+    // COMPONENT 4: Background Retry with Exponential Backoff
+    // ============================================================================
+
+    let retryIntervalId = null;
+
+    /**
+     * Initialize background retry mechanism
+     * Checks every 30 seconds for pending uploads and retries if conditions met
+     */
+    function initBackgroundRetry() {
+        if (retryIntervalId) clearInterval(retryIntervalId);
+
+        // Check immediately on init
+        checkAndRetryPendingUploads();
+
+        // Then check every 30 seconds
+        retryIntervalId = setInterval(checkAndRetryPendingUploads, 30000);
+    }
+
+    /**
+     * Check and retry pending uploads
+     */
+    async function checkAndRetryPendingUploads() {
+        if (!githubSync || !githubSync.isConfigured) {
+            return; // Skip if GitHub not configured
+        }
+
+        const pendingQueue = getPendingUploadsQueue();
+        const now = new Date();
+
+        for (const pending of pendingQueue.uploads) {
+            const nextRetryTime = new Date(pending.nextRetryTime);
+
+            // Skip if not yet time to retry
+            if (now < nextRetryTime) {
+                continue;
+            }
+
+            // Max retries exceeded?
+            if (pending.attempts >= 5) {
+                continue; // Will be marked as failed, user can manually retry
+            }
+
+            try {
+                // Retry upload
+                console.log(`[Retry] Attempting to upload ${pending.fileData.fileName} (attempt ${pending.attempts + 1})`);
+
+                // Convert base64 back to blob for upload
+                const blob = dataURLtoBlob(pending.base64Content);
+                const file = new File([blob], pending.fileData.fileName, { type: blob.type });
+
+                const uploadResult = await githubSync.uploadFileAndGetUrl(file, 'office-copy');
+
+                // Update fileData with successful upload
+                const fileIndex = officeFiles.findIndex(f => f.id === pending.fileData.id);
+                if (fileIndex !== -1) {
+                    officeFiles[fileIndex].fileUrl = uploadResult.url;
+                    officeFiles[fileIndex].filePath = uploadResult.path;
+                    officeFiles[fileIndex].status = 'completed';
+                    officeFiles[fileIndex].pendingUpload = false;
+                }
+
+                // Remove from pending queue and save
+                updatePendingUploadStatus(pending.fileData.id, 'completed');
+
+                // Persist changes
+                await saveAllData();
+                renderOfficeCopyTable();
+
+                console.log(`[Retry] Successfully synced ${pending.fileData.fileName}`);
+                showNotification(`File synced: ${pending.fileData.fileName}`, 'success');
+
+            } catch (error) {
+                console.warn(`[Retry] Failed to upload ${pending.fileData.fileName}:`, error.message);
+
+                // Update retry count and backoff
+                updatePendingUploadStatus(pending.fileData.id, 'pending', true);
+
+                // Mark as failed if max retries reached
+                const updatedQueue = getPendingUploadsQueue();
+                const uploadItem = updatedQueue.uploads.find(u => u.fileData.id === pending.fileData.id);
+
+                if (uploadItem && uploadItem.attempts >= 5) {
+                    const fileIndex = officeFiles.findIndex(f => f.id === pending.fileData.id);
+                    if (fileIndex !== -1) {
+                        officeFiles[fileIndex].status = 'failed';
+                    }
+                }
+            }
+        }
+
+        // Update sync status
+        updateSyncStatusIndicator();
+    }
+
+    /**
+     * Helper: Convert data URL to blob
+     */
+    function dataURLtoBlob(dataURL) {
+        const parts = dataURL.split(',');
+        const bstr = atob(parts[1]);
+        const ab = new ArrayBuffer(bstr.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < bstr.length; i++) {
+            ia[i] = bstr.charCodeAt(i);
+        }
+        return new Blob([ab], { type: 'application/octet-stream' });
+    }
+
+    // ============================================================================
+    // INITIALIZATION & INTEGRATION
+    // ============================================================================
+
+    /**
+     * Hook into existing application initialization
+     * Called after DOMContentLoaded to integrate Phase 1 features
+     */
+    function initializePhase1() {
+        // Wait for app to be ready (DOMContentLoaded + modals loaded)
+        setTimeout(() => {
+            try {
+                // Component 2: Setup upload persistence fix
+                setupUploadPersistenceFix();
+
+                // Component 3: Merge pending data (called after data load)
+                // This will be integrated into the data load flow
+
+                // Component 4: Start background retry
+                initBackgroundRetry();
+
+                console.log('[Phase 1] File persistence, merge, and retry features initialized');
+            } catch (error) {
+                console.error('[Phase 1] Initialization error:', error);
+            }
+        }, 500);
+    }
+
+    /**
+     * Hook into existing initializeData function
+     * Wrap the original to add our merge logic
+     */
+    const originalInitializeData = window.initializeData;
+    if (originalInitializeData && typeof originalInitializeData === 'function') {
+        window.initializeData = async function() {
+            // Call original
+            await originalInitializeData.call(this);
+
+            // Add our merge logic after data is loaded
+            mergeRemoteAndPendingData();
+
+            // Re-render office copy table to include pending files
+            if (typeof renderOfficeCopyTable === 'function') {
+                renderOfficeCopyTable();
+            }
+        };
+    }
+
+    /**
+     * Update renderOfficeCopyTable to show pending/failed status badges
+     */
+    const originalRenderOfficeCopyTable = window.renderOfficeCopyTable;
+    if (originalRenderOfficeCopyTable && typeof originalRenderOfficeCopyTable === 'function') {
+        window.renderOfficeCopyTable = function() {
+            // Call original
+            originalRenderOfficeCopyTable.call(this);
+
+            // Add status badges for pending/failed files
+            officeFiles.forEach(file => {
+                const fileRow = document.querySelector(`tr[data-file-id="${file.id}"]`);
+                if (fileRow && file.pendingUpload) {
+                    const statusCell = fileRow.querySelector('td:nth-child(5)'); // Actions column
+                    if (statusCell && !statusCell.querySelector('.badge')) {
+                        if (file.status === 'pending') {
+                            statusCell.insertAdjacentHTML('beforeend',
+                                ' <span class="badge bg-warning ms-2">⏳ Pending</span>'
+                            );
+                        } else if (file.status === 'failed') {
+                            statusCell.insertAdjacentHTML('beforeend',
+                                ' <span class="badge bg-danger ms-2">✗ Failed</span>'
+                            );
+                        }
+                    }
+                }
+            });
+        };
+    }
+
+    // Initialize Phase 1 when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase1);
+    } else {
+        initializePhase1();
+    }
+    </script>
+
+    <!-- Phase 2 Implementation: Upload Progress UI & Sync Status Enhancement -->
+    <script>
+    /**
+     * PHASE 2 IMPLEMENTATION
+     * Component 1: Upload progress UI with XMLHttpRequest and real-time metrics
+     * Component 4: Enhanced sync status indicator with pending upload counts
+     */
+
+    // ============================================================================
+    // COMPONENT 1: Upload Progress UI with XMLHttpRequest
+    // ============================================================================
+
+    // Track upload progress metrics
+    let uploadMetrics = {
+        speedHistory: [],
+        maxHistoryLength: 5,
+        intervalMs: 250
+    };
+
+    /**
+     * Initialize upload progress tracking with XMLHttpRequest
+     * Replaces simple upload with real-time progress monitoring
+     */
+    function setupUploadProgressTracking() {
+        const uploadBtn = document.getElementById('uploadFileSubmitBtn');
+        const progressContainer = document.getElementById('fileUploadProgressContainer');
+        const progressBar = document.getElementById('fileUploadProgressBar');
+        const percentSpan = document.getElementById('fileUploadPercent');
+        const bytesSpan = document.getElementById('fileUploadBytes');
+        const speedSpan = document.getElementById('fileUploadSpeed');
+        const etaSpan = document.getElementById('fileUploadETA');
+        const statusSpan = document.getElementById('fileUploadStatus');
+        const linkElement = document.getElementById('fileUploadLink');
+
+        if (!uploadBtn || !progressContainer) return;
+
+        // Wrap existing upload handler to inject progress tracking
+        const uploadForm = document.getElementById('uploadFileForm');
+        if (!uploadForm) return;
+
+        // Store original form handler
+        const originalSubmitHandler = uploadForm.onsubmit;
+
+        uploadForm.addEventListener('submit', async (e) => {
+            const fileInput = document.getElementById('fileUpload');
+
+            if (!fileInput.files.length) {
+                return; // Let original handler deal with this
+            }
+
+            const file = fileInput.files[0];
+
+            // Show progress UI
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            percentSpan.textContent = '0%';
+            bytesSpan.textContent = '0 B / 0 B';
+            speedSpan.textContent = '0 KB/s';
+            etaSpan.textContent = '--:--:--';
+            statusSpan.textContent = '📤 Uploading...';
+            linkElement.style.display = 'none';
+            uploadMetrics.speedHistory = [];
+
+            // Upload with progress tracking
+            await trackUploadProgress(file, uploadBtn, progressContainer, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan, statusSpan, linkElement);
+        });
+    }
+
+    /**
+     * Track upload progress using XMLHttpRequest
+     */
+    async function trackUploadProgress(file, uploadBtn, progressContainer, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan, statusSpan, linkElement) {
+        const totalBytes = file.size;
+        let uploadedBytes = 0;
+        const startTime = Date.now();
+
+        return new Promise(async (resolve) => {
+            try {
+                // Read file as ArrayBuffer for base64 encoding
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                const base64Content = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+
+                if (githubSync && githubSync.isConfigured) {
+                    // Use XMLHttpRequest for progress tracking
+                    uploadWithXHR(file, base64Content, arrayBuffer, {
+                        onProgress: (loaded, total) => {
+                            uploadedBytes = loaded;
+                            updateProgressUI(loaded, total, startTime, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan);
+                        },
+                        onSuccess: (result) => {
+                            statusSpan.innerHTML = '✅ Completed [' + new Date().toLocaleTimeString() + ']';
+                            progressBar.style.width = '100%';
+                            percentSpan.textContent = '100%';
+                            linkElement.href = result.url;
+                            linkElement.style.display = 'inline-block';
+                            resolve();
+                        },
+                        onError: (error) => {
+                            statusSpan.innerHTML = '⚠️ Saved locally (will sync)';
+                            resolve();
+                        }
+                    });
+                } else {
+                    // Offline: just track base64 encoding progress
+                    statusSpan.innerHTML = '💾 Saving locally...';
+                    progressBar.style.width = '100%';
+                    percentSpan.textContent = '100%';
+                    resolve();
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                statusSpan.innerHTML = '❌ Failed';
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * Helper: Read file as ArrayBuffer
+     */
+    function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    /**
+     * Upload file via XMLHttpRequest with progress events
+     */
+    function uploadWithXHR(file, base64Content, arrayBuffer, callbacks) {
+        const xhr = new XMLHttpRequest();
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${sanitizeFilename(file.name)}`;
+        const path = `office-copy/${fileName}`;
+
+        // Track progress events
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                callbacks.onProgress(e.loaded, e.total);
+            }
+        });
+
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200 || xhr.status === 201) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    callbacks.onSuccess({
+                        url: response.content.download_url,
+                        path: path,
+                        filename: fileName
+                    });
+                } catch (e) {
+                    callbacks.onError(e);
+                }
+            } else {
+                callbacks.onError(new Error(`HTTP ${xhr.status}`));
+            }
+        });
+
+        xhr.addEventListener('error', () => {
+            callbacks.onError(new Error('Upload failed'));
+        });
+
+        // Construct GitHub API URL
+        const url = `https://api.github.com/repos/${githubSync.settings.owner}/${githubSync.settings.repo}/contents/${path}`;
+
+        // Get existing file SHA if it exists
+        const getExistingFile = async () => {
+            try {
+                const response = await fetch(url, {
+                    headers: githubSync.getHeaders()
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sha;
+                }
+            } catch (e) {}
+            return null;
+        };
+
+        // Upload file
+        (async () => {
+            try {
+                const sha = await getExistingFile();
+                const body = {
+                    message: `Upload ${file.name}`,
+                    content: base64Content,
+                    branch: githubSync.settings.branch
+                };
+
+                if (sha) {
+                    body.sha = sha;
+                }
+
+                xhr.open('PUT', url);
+                xhr.setRequestHeader('Authorization', `token ${githubSync.settings.token}`);
+                xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(body));
+            } catch (error) {
+                callbacks.onError(error);
+            }
+        })();
+    }
+
+    /**
+     * Update progress UI with real-time metrics
+     */
+    function updateProgressUI(loaded, total, startTime, progressBar, percentSpan, bytesSpan, speedSpan, etaSpan) {
+        const elapsed = (Date.now() - startTime) / 1000; // seconds
+        const percent = (loaded / total) * 100;
+
+        // Update progress bar
+        progressBar.style.width = percent + '%';
+        progressBar.setAttribute('aria-valuenow', Math.floor(percent));
+        percentSpan.textContent = Math.floor(percent) + '%';
+
+        // Update bytes
+        bytesSpan.textContent = formatBytes(loaded) + ' / ' + formatBytes(total);
+
+        // Calculate speed (rolling average)
+        const now = Date.now();
+        uploadMetrics.speedHistory.push({ time: now, bytes: loaded });
+
+        // Remove old entries (older than 1.25 seconds)
+        while (uploadMetrics.speedHistory.length > 1 &&
+               uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].time -
+               uploadMetrics.speedHistory[0].time > 1250) {
+            uploadMetrics.speedHistory.shift();
+        }
+
+        // Calculate speed from history
+        if (uploadMetrics.speedHistory.length > 1) {
+            const timespan = (uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].time -
+                            uploadMetrics.speedHistory[0].time) / 1000; // seconds
+            const bytesDiff = uploadMetrics.speedHistory[uploadMetrics.speedHistory.length - 1].bytes -
+                            uploadMetrics.speedHistory[0].bytes;
+            const speedBytesPerSec = bytesDiff / timespan;
+            const speedKBPerSec = speedBytesPerSec / 1024;
+
+            speedSpan.textContent = speedKBPerSec.toFixed(0) + ' KB/s';
+
+            // Calculate ETA
+            const bytesRemaining = total - loaded;
+            const etaSeconds = Math.floor(bytesRemaining / speedBytesPerSec);
+            etaSpan.textContent = formatSeconds(etaSeconds);
+        }
+    }
+
+    /**
+     * Helper: Format bytes to human readable
+     */
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    /**
+     * Helper: Format seconds to HH:MM:SS
+     */
+    function formatSeconds(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return [hours, minutes, secs]
+            .map(x => String(x).padStart(2, '0'))
+            .join(':');
+    }
+
+    // ============================================================================
+    // COMPONENT 4: Enhanced Sync Status Indicator
+    // ============================================================================
+
+    /**
+     * Update sync status with pending upload info
+     */
+    function enhanceSyncStatusIndicator() {
+        const pendingQueue = getPendingUploadsQueue();
+        const syncStatusText = document.getElementById('syncStatusText');
+        const syncStatusArea = document.getElementById('syncStatusArea');
+
+        if (!syncStatusText || !syncStatusArea) return;
+
+        if (!githubSync || !githubSync.isConfigured) {
+            syncStatusText.textContent = '⚪ Not configured — saving locally';
+            return;
+        }
+
+        const pendingCount = pendingQueue.uploads.length;
+        const timestamp = new Date().toLocaleTimeString();
+
+        if (pendingCount === 0) {
+            syncStatusText.innerHTML = `✅ Synced — ${timestamp}`;
+            syncStatusArea.style.color = '#28a745';
+        } else {
+            const failedCount = pendingQueue.uploads.filter(u => u.attempts >= 5).length;
+
+            if (failedCount > 0) {
+                syncStatusText.innerHTML = `⚠️ Sync failed — ${failedCount} item(s) stored locally (${timestamp})`;
+                syncStatusArea.style.color = '#dc3545';
+            } else {
+                syncStatusText.innerHTML = `⟳ Syncing... ${pendingCount} pending upload(s)`;
+                syncStatusArea.style.color = '#ffc107';
+            }
+        }
+    }
+
+    // ============================================================================
+    // PHASE 2 INITIALIZATION
+    // ============================================================================
+
+    function initializePhase2() {
+        setTimeout(() => {
+            try {
+                // Component 1: Setup upload progress tracking
+                setupUploadProgressTracking();
+
+                // Component 4: Update sync status
+                enhanceSyncStatusIndicator();
+
+                // Update sync status every 5 seconds
+                setInterval(enhanceSyncStatusIndicator, 5000);
+
+                console.log('[Phase 2] Upload progress UI and sync status initialized');
+            } catch (error) {
+                console.error('[Phase 2] Initialization error:', error);
+            }
+        }, 1000);
+    }
+
+    // Initialize when Phase 1 is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase2);
+    } else {
+        setTimeout(initializePhase2, 1000);
+    }
+    </script>
+
+    <!-- Phase 3 Implementation: Responsive Sidebar, Mobile Dropdowns, Modal Scrolling -->
+    <script>
+    /**
+     * PHASE 3 IMPLEMENTATION
+     * Component 5: Responsive overhaul with sidebar toggle, mobile profile dropdown, modal fixes
+     */
+
+    // ============================================================================
+    // COMPONENT 5A: Sidebar Toggle & Collapse Management
+    // ============================================================================
+
+    /**
+     * Initialize sidebar toggle for tablet/mobile
+     */
+    function initSidebarToggle() {
+        const toggleBtn = document.getElementById('sidebarToggleBtnNew');
+        const backdrop = document.getElementById('sidebarBackdropNew');
+        const sidebar = document.getElementById('sidebar');
+        const body = document.body;
+
+        if (!toggleBtn) return;
+
+        // Toggle sidebar on button click
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
+        });
+
+        // Close sidebar on backdrop click
+        if (backdrop) {
+            backdrop.addEventListener('click', (e) => {
+                e.preventDefault();
+                body.classList.remove('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            });
+        }
+
+        // Close sidebar when nav link clicked on mobile
+        const navLinks = document.querySelectorAll('.sidebar .nav-link[data-page]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    body.classList.remove('sidebar-collapsed');
+                    localStorage.setItem('sidebarCollapsed', 'false');
+                }
+            });
+        });
+
+        // Restore sidebar state from localStorage
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            body.classList.add('sidebar-collapsed');
+        }
+    }
+
+    /**
+     * Handle window resize to adjust sidebar state
+     */
+    function handleResponsiveResize() {
+        const body = document.body;
+
+        window.addEventListener('resize', () => {
+            // On desktop, always show sidebar
+            if (window.innerWidth >= 1024) {
+                body.classList.remove('sidebar-collapsed');
+            }
+        });
+    }
+
+    // ============================================================================
+    // COMPONENT 5B: Mobile Profile Dropdown Sync
+    // ============================================================================
+
+    /**
+     * Sync profile data to mobile dropdown
+     */
+    function syncMobileProfileDropdown() {
+        if (!currentUser) return;
+
+        const mobileProfileUsername = document.getElementById('mobileProfileUsername');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
+        if (mobileProfileUsername) {
+            mobileProfileUsername.textContent = currentUser.name || currentUser.username || 'User';
+        }
+
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout(); // Existing logout function
+            });
+        }
+    }
+
+    // ============================================================================
+    // COMPONENT 5C: Modal Responsiveness & Scrolling Fixes
+    // ============================================================================
+
+    /**
+     * Fix modals for mobile/tablet screens
+     */
+    function fixModalResponsiveness() {
+        // Get all modals
+        const modals = document.querySelectorAll('.modal');
+
+        modals.forEach(modal => {
+            // Ensure modal body is scrollable
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.style.overflowY = 'auto';
+                modalBody.style.maxHeight = 'calc(90vh - 180px)';
+            }
+
+            // Ensure modal header stays visible
+            const modalHeader = modal.querySelector('.modal-header');
+            if (modalHeader) {
+                modalHeader.style.position = 'sticky';
+                modalHeader.style.top = '0';
+                modalHeader.style.zIndex = '1000';
+                modalHeader.style.backgroundColor = 'white';
+            }
+
+            // Ensure modal footer stays at bottom
+            const modalFooter = modal.querySelector('.modal-footer');
+            if (modalFooter) {
+                modalFooter.style.position = 'sticky';
+                modalFooter.style.bottom = '0';
+                modalFooter.style.zIndex = '1000';
+                modalFooter.style.backgroundColor = 'white';
+            }
+        });
+
+        // Use Bootstrap events to update modals when they're shown
+        const bootstrapModals = document.querySelectorAll('[id*="Modal"]');
+        bootstrapModals.forEach(modalEl => {
+            modalEl.addEventListener('shown.bs.modal', () => {
+                const modalBody = modalEl.querySelector('.modal-body');
+                if (modalBody) {
+                    // Reset scroll on modal open
+                    modalBody.scrollTop = 0;
+                }
+            });
+        });
+    }
+
+    /**
+     * Fix table responsiveness on small screens
+     */
+    function fixTableResponsiveness() {
+        // Ensure tables wrap properly
+        const tables = document.querySelectorAll('table');
+        tables.forEach(table => {
+            if (!table.parentElement.classList.contains('table-responsive')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive';
+                table.parentElement.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            }
+        });
+    }
+
+    // ============================================================================
+    // PHASE 3 INITIALIZATION
+    // ============================================================================
+
+    function initializePhase3() {
+        setTimeout(() => {
+            try {
+                // Component 5A: Sidebar toggle
+                initSidebarToggle();
+                handleResponsiveResize();
+
+                // Component 5B: Mobile profile dropdown
+                syncMobileProfileDropdown();
+
+                // Component 5C: Modal and table responsiveness
+                fixModalResponsiveness();
+                fixTableResponsiveness();
+
+                console.log('[Phase 3] Responsive sidebar, mobile profile, and modal fixes initialized');
+            } catch (error) {
+                console.error('[Phase 3] Initialization error:', error);
+            }
+        }, 1500);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase3);
+    } else {
+        setTimeout(initializePhase3, 1500);
+    }
+    </script>
 </body>
 </html> 
