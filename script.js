@@ -607,12 +607,11 @@ async function initializeData() {
             reminders = data.reminders || [];
             messages = data.messages || [];
             
-            // If no users exist, ensure default admin exists
+            // If no users exist, create ephemeral admin user (in memory only, not persisted)
             if (users.length === 0) {
                 users = [
                     { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' }
                 ];
-                await saveAllData();
             }
             
             showNotification(`Data loaded successfully ${githubSync.isConfigured ? 'from GitHub' : 'from local storage'}`, 'success');
