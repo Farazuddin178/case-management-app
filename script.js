@@ -814,6 +814,98 @@ function updateLastSyncInfo(syncResult) {
     }
 }
 
+// Auto-Sync Infrastructure
+
+// Trigger automatic sync after CRUD operations
+async function triggerAutoSync(operationName) {
+    if (!githubSync) {
+        console.warn('GitHub sync not available');
+        return;
+    }
+
+    try {
+        const allData = {
+            users,
+            cases,
+            tasks,
+            invoices,
+            officeFiles,
+            notifications,
+            reminders,
+            messages
+        };
+
+        const result = await githubSync.saveData(allData);
+        updateSyncStatusIndicator();
+        updateLastSyncInfo(result);
+
+        if (result.mode === 'github') {
+            console.log(`[Auto-Sync] ${operationName} synced to GitHub`);
+        } else {
+            console.log(`[Auto-Sync] ${operationName} saved locally (GitHub unavailable)`);
+        }
+    } catch (error) {
+        console.error(`[Auto-Sync] Failed to sync ${operationName}:`, error);
+        updateLastSyncInfo({ error: error.message, mode: 'localStorage' });
+    }
+}
+
+// Setup auto-sync hooks for all CRUD forms
+function setupAutoSyncHooks() {
+    // Helper to add sync to form submission
+    const addSyncToForm = (formId, operationName) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        // Listen for form submit
+        form.addEventListener('submit', async (e) => {
+            // Allow default submission first
+            const originalSubmit = form.onsubmit;
+            setTimeout(() => {
+                triggerAutoSync(operationName);
+            }, 500);
+        });
+    };
+
+    // Hook all CRUD forms
+    addSyncToForm('addCaseForm', 'Case Update');
+    addSyncToForm('addTaskForm', 'Task Update');
+    addSyncToForm('addUserForm', 'User Update');
+    addSyncToForm('addInvoiceForm', 'Invoice Update');
+    addSyncToForm('uploadFileForm', 'File Upload');
+    addSyncToForm('profileForm', 'Profile Update');
+
+    // Hook delete operations - intercept delete buttons
+    const hookDeleteButton = (buttonId, operationName) => {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+
+        const originalClick = button.onclick;
+        button.addEventListener('click', async (e) => {
+            // Allow delete to process first
+            setTimeout(() => {
+                triggerAutoSync(operationName);
+            }, 500);
+        });
+    };
+
+    // Note: Delete buttons are dynamically created in tables
+    // We'll use event delegation via document for dynamic delete buttons
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('delete-case-btn')) {
+            setTimeout(() => triggerAutoSync('Case Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-task-btn')) {
+            setTimeout(() => triggerAutoSync('Task Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-user-btn')) {
+            setTimeout(() => triggerAutoSync('User Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-invoice-btn')) {
+            setTimeout(() => triggerAutoSync('Invoice Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-file-btn')) {
+            setTimeout(() => triggerAutoSync('File Delete'), 500);
+        }
+    });
+}
+
 // Authentication functions
 function showLoginScreen() {
     // In a SPA context, redirect to login
