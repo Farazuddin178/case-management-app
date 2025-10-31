@@ -1859,5 +1859,199 @@
         setTimeout(initializePhase2, 1000);
     }
     </script>
+
+    <!-- Phase 3 Implementation: Responsive Sidebar, Mobile Dropdowns, Modal Scrolling -->
+    <script>
+    /**
+     * PHASE 3 IMPLEMENTATION
+     * Component 5: Responsive overhaul with sidebar toggle, mobile profile dropdown, modal fixes
+     */
+
+    // ============================================================================
+    // COMPONENT 5A: Sidebar Toggle & Collapse Management
+    // ============================================================================
+
+    /**
+     * Initialize sidebar toggle for tablet/mobile
+     */
+    function initSidebarToggle() {
+        const toggleBtn = document.getElementById('sidebarToggleBtnNew');
+        const backdrop = document.getElementById('sidebarBackdropNew');
+        const sidebar = document.getElementById('sidebar');
+        const body = document.body;
+
+        if (!toggleBtn) return;
+
+        // Toggle sidebar on button click
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
+        });
+
+        // Close sidebar on backdrop click
+        if (backdrop) {
+            backdrop.addEventListener('click', (e) => {
+                e.preventDefault();
+                body.classList.remove('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            });
+        }
+
+        // Close sidebar when nav link clicked on mobile
+        const navLinks = document.querySelectorAll('.sidebar .nav-link[data-page]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    body.classList.remove('sidebar-collapsed');
+                    localStorage.setItem('sidebarCollapsed', 'false');
+                }
+            });
+        });
+
+        // Restore sidebar state from localStorage
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            body.classList.add('sidebar-collapsed');
+        }
+    }
+
+    /**
+     * Handle window resize to adjust sidebar state
+     */
+    function handleResponsiveResize() {
+        const body = document.body;
+
+        window.addEventListener('resize', () => {
+            // On desktop, always show sidebar
+            if (window.innerWidth >= 1024) {
+                body.classList.remove('sidebar-collapsed');
+            }
+        });
+    }
+
+    // ============================================================================
+    // COMPONENT 5B: Mobile Profile Dropdown Sync
+    // ============================================================================
+
+    /**
+     * Sync profile data to mobile dropdown
+     */
+    function syncMobileProfileDropdown() {
+        if (!currentUser) return;
+
+        const mobileProfileUsername = document.getElementById('mobileProfileUsername');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
+        if (mobileProfileUsername) {
+            mobileProfileUsername.textContent = currentUser.name || currentUser.username || 'User';
+        }
+
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout(); // Existing logout function
+            });
+        }
+    }
+
+    // ============================================================================
+    // COMPONENT 5C: Modal Responsiveness & Scrolling Fixes
+    // ============================================================================
+
+    /**
+     * Fix modals for mobile/tablet screens
+     */
+    function fixModalResponsiveness() {
+        // Get all modals
+        const modals = document.querySelectorAll('.modal');
+
+        modals.forEach(modal => {
+            // Ensure modal body is scrollable
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.style.overflowY = 'auto';
+                modalBody.style.maxHeight = 'calc(90vh - 180px)';
+            }
+
+            // Ensure modal header stays visible
+            const modalHeader = modal.querySelector('.modal-header');
+            if (modalHeader) {
+                modalHeader.style.position = 'sticky';
+                modalHeader.style.top = '0';
+                modalHeader.style.zIndex = '1000';
+                modalHeader.style.backgroundColor = 'white';
+            }
+
+            // Ensure modal footer stays at bottom
+            const modalFooter = modal.querySelector('.modal-footer');
+            if (modalFooter) {
+                modalFooter.style.position = 'sticky';
+                modalFooter.style.bottom = '0';
+                modalFooter.style.zIndex = '1000';
+                modalFooter.style.backgroundColor = 'white';
+            }
+        });
+
+        // Use Bootstrap events to update modals when they're shown
+        const bootstrapModals = document.querySelectorAll('[id*="Modal"]');
+        bootstrapModals.forEach(modalEl => {
+            modalEl.addEventListener('shown.bs.modal', () => {
+                const modalBody = modalEl.querySelector('.modal-body');
+                if (modalBody) {
+                    // Reset scroll on modal open
+                    modalBody.scrollTop = 0;
+                }
+            });
+        });
+    }
+
+    /**
+     * Fix table responsiveness on small screens
+     */
+    function fixTableResponsiveness() {
+        // Ensure tables wrap properly
+        const tables = document.querySelectorAll('table');
+        tables.forEach(table => {
+            if (!table.parentElement.classList.contains('table-responsive')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive';
+                table.parentElement.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            }
+        });
+    }
+
+    // ============================================================================
+    // PHASE 3 INITIALIZATION
+    // ============================================================================
+
+    function initializePhase3() {
+        setTimeout(() => {
+            try {
+                // Component 5A: Sidebar toggle
+                initSidebarToggle();
+                handleResponsiveResize();
+
+                // Component 5B: Mobile profile dropdown
+                syncMobileProfileDropdown();
+
+                // Component 5C: Modal and table responsiveness
+                fixModalResponsiveness();
+                fixTableResponsiveness();
+
+                console.log('[Phase 3] Responsive sidebar, mobile profile, and modal fixes initialized');
+            } catch (error) {
+                console.error('[Phase 3] Initialization error:', error);
+            }
+        }, 1500);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePhase3);
+    } else {
+        setTimeout(initializePhase3, 1500);
+    }
+    </script>
 </body>
 </html> 
