@@ -44,13 +44,17 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             // Update sync status indicator
             updateSyncStatusIndicator();
+            updateLastSyncInfo();
         } else {
             showLoginScreen();
         }
 
         // Setup event listeners
         setupEventListeners();
-        
+
+        // Setup auto-sync hooks for CRUD operations
+        setupAutoSyncHooks();
+
         // Start reminder system
         startReminderSystem();
         
@@ -607,22 +611,24 @@ async function initializeData() {
             reminders = data.reminders || [];
             messages = data.messages || [];
             
-            // If no users exist, ensure default admin exists
+            // If no users exist, create ephemeral admin user (in memory only, not persisted)
             if (users.length === 0) {
                 users = [
                     { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' }
                 ];
-                await saveAllData();
             }
             
             showNotification(`Data loaded successfully ${githubSync.isConfigured ? 'from GitHub' : 'from local storage'}`, 'success');
         } else {
-            // Fallback to default data
-            users = [
-                { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' },
-                { id: 2, username: 'manager', password: 'Manager123!', role: 'restricted_admin', email: 'manager@example.com', phone: '+1234567891' },
-                { id: 3, username: 'viewer', password: 'Viewer123!', role: 'viewer', email: 'viewer@example.com', phone: '+1234567892' }
-            ];
+            // Fallback to default data (ephemeral admin only when no users exist)
+            users = [];
+
+            // Create ephemeral admin user in memory only
+            if (users.length === 0) {
+                users = [
+                    { id: 1, username: 'admin', password: 'Admin123!', role: 'admin', email: 'admin@example.com', phone: '+1234567890' }
+                ];
+            }
             
             cases = [
                 { 
@@ -783,11 +789,12 @@ function updateSyncStatusIndicator() {
     }
 }
 
-// Update last sync info
-function updateLastSyncInfo() {
+// Update last sync info with sync status messages
+function updateLastSyncInfo(syncResult) {
     const lastSyncEl = document.getElementById('lastSyncInfo');
+    const syncStatusEl = document.getElementById('syncStatusText');
     if (!lastSyncEl || !githubSync) return;
-    
+
     const status = githubSync.getSyncStatus();
     if (status.lastSync) {
         const date = new Date(status.lastSync);
@@ -795,6 +802,112 @@ function updateLastSyncInfo() {
     } else {
         lastSyncEl.textContent = 'Last sync: Never';
     }
+
+    // Update sync status text based on result
+    if (syncStatusEl) {
+        if (!githubSync.isConfigured) {
+            syncStatusEl.textContent = 'Not configured — saving locally';
+        } else if (syncResult) {
+            const timestamp = new Date().toLocaleTimeString();
+            if (syncResult.mode === 'github' && syncResult.success) {
+                syncStatusEl.textContent = `Synced to GitHub at ${timestamp}`;
+            } else if (syncResult.error || syncResult.mode === 'localStorage') {
+                syncStatusEl.textContent = `Sync failed — stored locally (${timestamp})`;
+            }
+        }
+    }
+}
+
+// Auto-Sync Infrastructure
+
+// Trigger automatic sync after CRUD operations
+async function triggerAutoSync(operationName) {
+    if (!githubSync) {
+        console.warn('GitHub sync not available');
+        return;
+    }
+
+    try {
+        const allData = {
+            users,
+            cases,
+            tasks,
+            invoices,
+            officeFiles,
+            notifications,
+            reminders,
+            messages
+        };
+
+        const result = await githubSync.saveData(allData);
+        updateSyncStatusIndicator();
+        updateLastSyncInfo(result);
+
+        if (result.mode === 'github') {
+            console.log(`[Auto-Sync] ${operationName} synced to GitHub`);
+        } else {
+            console.log(`[Auto-Sync] ${operationName} saved locally (GitHub unavailable)`);
+        }
+    } catch (error) {
+        console.error(`[Auto-Sync] Failed to sync ${operationName}:`, error);
+        updateLastSyncInfo({ error: error.message, mode: 'localStorage' });
+    }
+}
+
+// Setup auto-sync hooks for all CRUD forms
+function setupAutoSyncHooks() {
+    // Helper to add sync to form submission
+    const addSyncToForm = (formId, operationName) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        // Listen for form submit
+        form.addEventListener('submit', async (e) => {
+            // Allow default submission first
+            const originalSubmit = form.onsubmit;
+            setTimeout(() => {
+                triggerAutoSync(operationName);
+            }, 500);
+        });
+    };
+
+    // Hook all CRUD forms
+    addSyncToForm('addCaseForm', 'Case Update');
+    addSyncToForm('addTaskForm', 'Task Update');
+    addSyncToForm('addUserForm', 'User Update');
+    addSyncToForm('addInvoiceForm', 'Invoice Update');
+    addSyncToForm('uploadFileForm', 'File Upload');
+    addSyncToForm('profileForm', 'Profile Update');
+
+    // Hook delete operations - intercept delete buttons
+    const hookDeleteButton = (buttonId, operationName) => {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+
+        const originalClick = button.onclick;
+        button.addEventListener('click', async (e) => {
+            // Allow delete to process first
+            setTimeout(() => {
+                triggerAutoSync(operationName);
+            }, 500);
+        });
+    };
+
+    // Note: Delete buttons are dynamically created in tables
+    // We'll use event delegation via document for dynamic delete buttons
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('delete-case-btn')) {
+            setTimeout(() => triggerAutoSync('Case Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-task-btn')) {
+            setTimeout(() => triggerAutoSync('Task Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-user-btn')) {
+            setTimeout(() => triggerAutoSync('User Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-invoice-btn')) {
+            setTimeout(() => triggerAutoSync('Invoice Delete'), 500);
+        } else if (e.target && e.target.classList && e.target.classList.contains('delete-file-btn')) {
+            setTimeout(() => triggerAutoSync('File Delete'), 500);
+        }
+    });
 }
 
 // Authentication functions
